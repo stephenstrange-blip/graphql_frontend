@@ -1,6 +1,6 @@
 // src/components/UserDisplay.tsx
+// import MessageDisplay from "./MessageDisplay"
 import { type User } from "../types"
-import MessageDisplay from "./MessageDisplay"
 
 interface Props {
   user: User
@@ -15,9 +15,7 @@ function UserDisplay({ user }: Props) {
           {user.name}
         </p>
       </div>
-      <div>
-        {user?.messages?.map((m, i) => <MessageDisplay message={m} index={i} key={i} />)}
-      </div>
+      
     </div>
   )
 }
