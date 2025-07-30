@@ -3,8 +3,17 @@
 
 @theme {
   --font-logo: "Open sans", sans-serif;
+  --color-primary: #004e7a;
+  --color-secondary: #d8c7fa;
+  --color-tertiary: #0cc0df;
+  --color-light: #ffe9db;
+  --color-bg: #00273d;
+
 }
 
 
 
 
+.min-w-input-constraint {
+  width: min(400px, 60%);
+}
