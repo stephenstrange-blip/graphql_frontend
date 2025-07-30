@@ -8,10 +8,10 @@ export default function Home(args: Route.ComponentProps) {
   console.log("Home args: ", args)
 
   return (
-    <div className="bg-[#e7e7e7] flex-col h-screen w-full flex items-center gap-y-0.5 overflow-hidden">
+    <div className="bg-[#e7e7e7] flex-col h-screen w-full flex items-center gap-y-0.5 ">
       <Header />
 
-      <main className="w-full h-full flex flex-col justify-center-safe items-center-safe">
+      <main className="size-full flex flex-col justify-center-safe items-center-safe">
         <p className="text-[30px] text-[#000000]">Welcome</p>
 
         <div className="flex flex-row">
