@@ -1,6 +1,6 @@
 import { StrictMode } from 'react'
 import './index.css'
-import { Client, cacheExchange, fetchExchange, Provider } from 'urql'
+import { Provider } from 'urql'
 import type { Route } from "./+types/root";
 import {
   isRouteErrorResponse,
@@ -11,10 +11,7 @@ import {
   ScrollRestoration,
 } from "react-router";
 
-const client = new Client({
-  url: import.meta.env.VITE_API_URL,
-  exchanges: [cacheExchange, fetchExchange]
-})
+import { client } from './client';
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
@@ -47,7 +44,6 @@ export default function App() {
         </Provider>
       </StrictMode>
     </>
-    // <Outlet/>
   );
 }
 
@@ -55,7 +51,7 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
   let message = "Oops!";
   let details = "An unexpected error occurred.";
   let stack: string | undefined;
-  
+
   if (isRouteErrorResponse(error)) {
     message = error.status === 404 ? "404" : "Error";
     details =
