@@ -1,5 +1,4 @@
 #!/bin/bash
-
 graphql-codegen
 
 # DECLARE VARIABLES
@@ -27,5 +26,6 @@ sed -i "1 s/$MATCH/$REPLACE/" src/graphql/generated.ts
 
 # Add necessary comment
 echo "$COMMENT" | cat - src/graphql/generated.ts > generated.ts && mv generated.ts src/graphql/generated.ts
+set -ex
 
 
