@@ -1,8 +1,7 @@
 query GetUsers {
   users {
     name
-    messages {
-      body
-    }
+    createdAt
   }
 }
+

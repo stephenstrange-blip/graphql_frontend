@@ -1,0 +1,33 @@
+subscription roundsPrepared {
+  roundsPrepared
+}
+
+subscription playerJoined {
+  playerJoined {
+    id
+    name
+    score
+  }
+}
+
+subscription gameUpdated($id: Int = 0) {
+  gameUpdated(id: $id ){
+    id
+    langTranslateFrom {
+      code
+      id
+    }
+    langTranslateTo {
+      code
+      id
+    }
+    numRounds
+    participants {
+      player {
+        name
+      }
+      score
+      playerId
+    }
+  }
+}

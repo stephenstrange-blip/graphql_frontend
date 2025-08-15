@@ -1,0 +1,49 @@
+mutation createGame(
+  $langTranslateFromId: Int = 1
+  $langTranslateToId: Int = 2
+  $numRounds: Int = 1
+  $userId: Int = 1
+) {
+  createGame(
+    langTranslateFromId: $langTranslateFromId
+    langTranslateToId: $langTranslateToId
+    numRounds: $numRounds
+    userId: $userId
+  ) {
+    ... on CustomError {
+      message
+      status
+    }
+    ... on MutationCreateGameSuccess {
+      __typename
+      data {
+        gameId
+        playerAdded
+        roundsPrepared
+      }
+    }
+  }
+}
+
+mutation updateGame(
+  $numRounds: Int = 1
+  $langTranslateToId: Int = 2
+  $langTranslateFromId: Int = 1
+  $gameId: Int = 1
+) {
+  changeGameSetting(
+    gameId: $gameId
+    langTranslateFromId: $langTranslateFromId
+    langTranslateToId: $langTranslateToId
+    numRounds: $numRounds
+  ) {
+    ... on MutationChangeGameSettingSuccess {
+      __typename
+      data
+    }
+    ... on CustomError {
+      message
+      status
+    }
+  }
+}

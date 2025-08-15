@@ -1,0 +1,59 @@
+query game($gameId: Int = 20) {
+  game(gameId: $gameId) {
+    ... on QueryGameSuccess {
+      __typename
+      data {
+        id
+        numRounds
+        translateFrom {
+          code
+          id
+        }
+        translateTo {
+          code
+          id
+        }
+        status
+        participants {
+          playerId
+          score
+          player {
+            name
+          }
+        }
+      }
+    }
+    ... on CustomError {
+      message
+      status
+    }
+  }
+}
+
+
+query games {
+  games {
+    ... on CustomError {
+      message
+      status
+    }
+    ... on QueryGamesSuccess {
+      __typename
+      data {
+        id
+        numRounds
+        start
+        status
+        translateFrom {
+          code
+          id
+        }
+        translateTo {
+          code
+          id
+        }
+        winnerId
+      }
+    }
+  }
+}
