@@ -47,3 +47,20 @@ mutation updateGame(
     }
   }
 }
+
+mutation joinGame($gameId: Int = 1, $userId: Int = 1) {
+  joinGame(gameId: $gameId, userId: $userId) {
+    ... on CustomError {
+      message
+      status
+    }
+    ... on MutationJoinGameSuccess {
+      __typename
+      data {
+        gameId
+        playerAdded
+        roundsPrepared
+      }
+    }
+  }
+}
