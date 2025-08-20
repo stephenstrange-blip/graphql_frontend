@@ -1,4 +1,4 @@
-import { useState, useContext, useEffect } from "react";
+import { useState, useContext, useEffect, type MouseEvent} from "react";
 import { Form } from "react-router";
 import type { langTranslate } from "../types/types";
 import { SubmitContext } from "./context";
@@ -34,11 +34,11 @@ export function PreparationSection({ to, from, numRounds, onSubmit }: { to: lang
   }))
 
   return (
-    <Form onSubmit={onSubmit}>
+    <Form onSubmit={onSubmit} className="p-5 flex-col flex items-center-safe gap-6">
       <HorizontalNumberInput id="numRounds" value={value} onChange={setValue}>
-        <label htmlFor="numRounds">Number of Rounds</label>
+        <label htmlFor="numRounds" className="text-center">Number of Rounds</label>
       </HorizontalNumberInput>
-      <span className="flex flex-row">
+      <span className="flex flex-row gap-50">
         <div className="flex" >
           <label htmlFor="from">From: </label>
           <Dropdown
@@ -57,7 +57,18 @@ export function PreparationSection({ to, from, numRounds, onSubmit }: { to: lang
         </div>
       </span>
 
-      <button type="submit" disabled={!!isFetching}>{isFetching ? "Loading..." : "Edit"}</button>
+      <div className="flex flex-row gap-2 justify-center-safe items-center-safe">
+        <button className="hover:bg-gray-300 p-2.5 rounded-[5px] min-w-15" type="submit" disabled={!!isFetching}>{isFetching ? "Applying..." : "Apply"}</button>
+        <button className="hover:bg-gray-300 p-2.5 rounded-[5px] min-w-15" onClick={startGame}>Start</button>
+      </div>
     </Form>
   )
+}
+
+
+export function startGame(e: MouseEvent<HTMLButtonElement>) {
+ e.preventDefault();
+ e.stopPropagation();
+
+ return
 }

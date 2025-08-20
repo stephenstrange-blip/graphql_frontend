@@ -23,13 +23,17 @@ export function PlayerInput() {
 export function HorizontalNumberInput({ children, id, onChange, value }:
   { children?: ReactNode, id: string, value: number, onChange: React.Dispatch<React.SetStateAction<number>> }) {
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col gap-5">
       {/* for labels - if any */}
       {children}
       <div className="flex-row flex">
-        <div className="left-arrow" onClick={() => onChange(v => v === 0 ? v : v - 1)}>-</div>
-        <input className="text-center" type="number" id={id} name={id} value={value} key={value} readOnly />
-        <div className="right-arrow" onClick={() => onChange(v => v === 10 ? v : v + 1)}>+</div>
+        <div onClick={() => onChange(v => v === 1 ? v : v - 1)}>
+          <p className="p-2.5 pr-5 pl-5 cursor-pointer hover:bg-gray-300 rounded-3xl">-</p>
+        </div>
+        <input className="text-center focus:border-0 max-w-fit w-20 pl-0.5" type="number" id={id} name={id} value={value} key={value} readOnly />
+        <div onClick={() => onChange(v => v === 10 ? v : v + 1)}>
+          <p className="p-2.5 pr-5 pl-5 cursor-pointer hover:bg-gray-300 rounded-3xl">+</p>
+        </div>
       </div>
     </div>
   )
