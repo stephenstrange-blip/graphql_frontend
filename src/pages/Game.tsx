@@ -33,7 +33,7 @@ export default function GamePage(args: Route.ComponentProps) {
 
   const { player, opponents } = filterParticipants(participants)
 
-  const handleSubmit: React.FormEventHandler<HTMLFormElement> = async (e: React.FormEvent<HTMLFormElement>) => {
+  const applyChanges: React.FormEventHandler<HTMLFormElement> = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError(null)
 
@@ -43,9 +43,9 @@ export default function GamePage(args: Route.ComponentProps) {
     if (_from === _to)
       return setError("Cannot translate from the same language!")
 
-    if (numRounds === _numRounds && from === _from && to === _to)
-      return // do nothing
-
+    if (numRounds === _numRounds && Number(from.id) === _from && Number(to.id) === _to) 
+      return setError("No changes detected!")
+    
     const payload = {
       gameId: gameId || 1,
       numRounds: _numRounds,
@@ -60,7 +60,6 @@ export default function GamePage(args: Route.ComponentProps) {
       return setError("Error: " + updateGameResult.error)
     if (updateGameResult.data?.changeGameSetting?.__typename === "CustomError")
       return setError(`Error (${updateGameResult.data.changeGameSetting.status}): ${updateGameResult.data?.changeGameSetting.message}`)
-
   }
 
   return (
@@ -70,7 +69,7 @@ export default function GamePage(args: Route.ComponentProps) {
         <PlayerSection player={player} />
         <OpponentSection opponents={opponents} numRounds={numRounds} toCode={to.code ?? ""} fromCode={from.code ?? ""} />
         <SubmitContext value={updateGameResult.fetching}>
-          <GameSection to={to} from={from} numRounds={numRounds} onSubmit={handleSubmit} />
+          <GameSection to={to} from={from} numRounds={numRounds} applyChanges={applyChanges} setError={setError} />
         </SubmitContext>
       </main>
     </>
