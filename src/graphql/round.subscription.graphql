@@ -1,0 +1,73 @@
+subscription timer($gameId: Int = 0) {
+  timer(gameId: $gameId) {
+    ... on CustomError {
+      message
+      status
+    }
+    ... on SubscriptionTimerSuccess {
+      __typename
+      data
+    }
+  }
+}
+
+subscription preCountDown($gameId: Int = 0) {
+  preCountDown(gameId: $gameId) {
+    ... on CustomError {
+      message
+      status
+    }
+    ... on SubscriptionPreCountDownSuccess {
+      __typename
+      data
+    }
+  }
+}
+
+subscription postCountDown($gameId: Int = 0) {
+  postCountDown(gameId: $gameId) {
+    ... on CustomError {
+      message
+      status
+    }
+    ... on SubscriptionPostCountDownSuccess {
+      __typename
+      data
+    }
+  }
+}
+
+subscription phase($gameId: Int = 0) {
+  phase(gameId: $gameId) {
+    ... on CustomError {
+      message
+      status
+    }
+    ... on SubscriptionPhaseSuccess {
+      __typename
+      data
+    }
+  }
+}
+
+subscription round($gameId: Int = 0) {
+  round(gameId: $gameId) {
+    ... on CustomError {
+      message
+      status
+    }
+    ... on SubscriptionRoundSuccess {
+      __typename
+      data {
+        end
+        id
+        roundNumber
+        start
+        wordTranslateFrom
+        wordTranslateFromId
+        wordTranslateTo
+        wordTranslateToId
+      }
+    }
+  }
+}

@@ -75,6 +75,7 @@ export type Mutation = {
   changeGameSetting?: Maybe<MutationChangeGameSettingResult>;
   createGame?: Maybe<MutationCreateGameResult>;
   joinGame?: Maybe<MutationJoinGameResult>;
+  startRound?: Maybe<MutationStartRoundResult>;
 };
 
 
@@ -105,6 +106,13 @@ export type MutationJoinGameArgs = {
   userId: Scalars['Int']['input'];
 };
 
+
+export type MutationStartRoundArgs = {
+  gameId: Scalars['Int']['input'];
+  langTranslateFrom: Scalars['String']['input'];
+  langTranslateTo: Scalars['String']['input'];
+};
+
 export type MutationChangeGameSettingResult = BaseError | CustomError | MutationChangeGameSettingSuccess;
 
 export type MutationChangeGameSettingSuccess = {
@@ -124,6 +132,13 @@ export type MutationJoinGameResult = BaseError | CustomError | MutationJoinGameS
 export type MutationJoinGameSuccess = {
   __typename?: 'MutationJoinGameSuccess';
   data: GameCreated;
+};
+
+export type MutationStartRoundResult = BaseError | CustomError | MutationStartRoundSuccess;
+
+export type MutationStartRoundSuccess = {
+  __typename?: 'MutationStartRoundSuccess';
+  data: Round;
 };
 
 export type Participant = {
@@ -170,25 +185,90 @@ export type QueryGamesSuccess = {
 
 export type Round = {
   __typename?: 'Round';
-  answer?: Maybe<Scalars['Int']['output']>;
+  answers?: Maybe<Array<Answer>>;
   gameId?: Maybe<Scalars['Int']['output']>;
   id?: Maybe<Scalars['ID']['output']>;
-  question?: Maybe<Scalars['Int']['output']>;
-  responses?: Maybe<Array<Answer>>;
   roundNumber?: Maybe<Scalars['Int']['output']>;
   startTime?: Maybe<Scalars['DateTime']['output']>;
+  wordTranslateFromId?: Maybe<Scalars['Int']['output']>;
+  wordTranslateToId?: Maybe<Scalars['Int']['output']>;
 };
 
 export type Subscription = {
   __typename?: 'Subscription';
   gameUpdated?: Maybe<GameUpdated>;
+  phase?: Maybe<SubscriptionPhaseResult>;
   playerJoined?: Maybe<PlayerJoined>;
+  postCountDown?: Maybe<SubscriptionPostCountDownResult>;
+  preCountDown?: Maybe<SubscriptionPreCountDownResult>;
+  round?: Maybe<SubscriptionRoundResult>;
   roundsPrepared?: Maybe<Scalars['Boolean']['output']>;
+  timer?: Maybe<SubscriptionTimerResult>;
 };
 
 
 export type SubscriptionGameUpdatedArgs = {
   id?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+export type SubscriptionPhaseArgs = {
+  gameId: Scalars['Int']['input'];
+};
+
+
+export type SubscriptionPostCountDownArgs = {
+  gameId: Scalars['Int']['input'];
+};
+
+
+export type SubscriptionPreCountDownArgs = {
+  gameId: Scalars['Int']['input'];
+};
+
+
+export type SubscriptionRoundArgs = {
+  gameId: Scalars['Int']['input'];
+};
+
+
+export type SubscriptionTimerArgs = {
+  gameId: Scalars['Int']['input'];
+};
+
+export type SubscriptionPhaseResult = BaseError | CustomError | SubscriptionPhaseSuccess;
+
+export type SubscriptionPhaseSuccess = {
+  __typename?: 'SubscriptionPhaseSuccess';
+  data: Scalars['String']['output'];
+};
+
+export type SubscriptionPostCountDownResult = BaseError | CustomError | SubscriptionPostCountDownSuccess;
+
+export type SubscriptionPostCountDownSuccess = {
+  __typename?: 'SubscriptionPostCountDownSuccess';
+  data: Scalars['Int']['output'];
+};
+
+export type SubscriptionPreCountDownResult = BaseError | CustomError | SubscriptionPreCountDownSuccess;
+
+export type SubscriptionPreCountDownSuccess = {
+  __typename?: 'SubscriptionPreCountDownSuccess';
+  data: Scalars['Int']['output'];
+};
+
+export type SubscriptionRoundResult = BaseError | CustomError | SubscriptionRoundSuccess;
+
+export type SubscriptionRoundSuccess = {
+  __typename?: 'SubscriptionRoundSuccess';
+  data: RoundPayload;
+};
+
+export type SubscriptionTimerResult = BaseError | CustomError | SubscriptionTimerSuccess;
+
+export type SubscriptionTimerSuccess = {
+  __typename?: 'SubscriptionTimerSuccess';
+  data: Scalars['Int']['output'];
 };
 
 export type User = {
@@ -204,6 +284,20 @@ export type GameCreated = {
   gameId?: Maybe<Scalars['Int']['output']>;
   playerAdded?: Maybe<Scalars['Boolean']['output']>;
   roundsPrepared?: Maybe<Scalars['Boolean']['output']>;
+};
+
+export type RoundPayload = {
+  __typename?: 'roundPayload';
+  end?: Maybe<Scalars['DateTime']['output']>;
+  gameId?: Maybe<Scalars['Int']['output']>;
+  id?: Maybe<Scalars['Int']['output']>;
+  phase?: Maybe<Scalars['String']['output']>;
+  roundNumber?: Maybe<Scalars['Int']['output']>;
+  start?: Maybe<Scalars['DateTime']['output']>;
+  wordTranslateFrom?: Maybe<Scalars['String']['output']>;
+  wordTranslateFromId?: Maybe<Scalars['Int']['output']>;
+  wordTranslateTo?: Maybe<Scalars['String']['output']>;
+  wordTranslateToId?: Maybe<Scalars['Int']['output']>;
 };
 
 export type CreateGameMutationVariables = Exact<{
@@ -263,6 +357,50 @@ export type GameUpdatedSubscriptionVariables = Exact<{
 
 export type GameUpdatedSubscription = { __typename?: 'Subscription', gameUpdated?: { __typename?: 'GameUpdated', id?: string | null, numRounds?: number | null, langTranslateFrom?: { __typename?: 'Language', code?: string | null, id?: string | null } | null, langTranslateTo?: { __typename?: 'Language', code?: string | null, id?: string | null } | null, participants?: Array<{ __typename?: 'Participant', score?: number | null, playerId?: number | null, player?: { __typename?: 'User', name?: string | null } | null }> | null } | null };
 
+export type StartRoundMutationVariables = Exact<{
+  gameId?: InputMaybe<Scalars['Int']['input']>;
+  langTranslateFrom?: InputMaybe<Scalars['String']['input']>;
+  langTranslateTo?: InputMaybe<Scalars['String']['input']>;
+}>;
+
+
+export type StartRoundMutation = { __typename?: 'Mutation', startRound?: { __typename?: 'BaseError' } | { __typename?: 'CustomError', message?: string | null, status?: number | null } | { __typename: 'MutationStartRoundSuccess', data: { __typename?: 'Round', wordTranslateFromId?: number | null, wordTranslateToId?: number | null, id?: string | null, startTime?: any | null } } | null };
+
+export type TimerSubscriptionVariables = Exact<{
+  gameId?: InputMaybe<Scalars['Int']['input']>;
+}>;
+
+
+export type TimerSubscription = { __typename?: 'Subscription', timer?: { __typename?: 'BaseError' } | { __typename?: 'CustomError', message?: string | null, status?: number | null } | { __typename: 'SubscriptionTimerSuccess', data: number } | null };
+
+export type PreCountDownSubscriptionVariables = Exact<{
+  gameId?: InputMaybe<Scalars['Int']['input']>;
+}>;
+
+
+export type PreCountDownSubscription = { __typename?: 'Subscription', preCountDown?: { __typename?: 'BaseError' } | { __typename?: 'CustomError', message?: string | null, status?: number | null } | { __typename: 'SubscriptionPreCountDownSuccess', data: number } | null };
+
+export type PostCountDownSubscriptionVariables = Exact<{
+  gameId?: InputMaybe<Scalars['Int']['input']>;
+}>;
+
+
+export type PostCountDownSubscription = { __typename?: 'Subscription', postCountDown?: { __typename?: 'BaseError' } | { __typename?: 'CustomError', message?: string | null, status?: number | null } | { __typename: 'SubscriptionPostCountDownSuccess', data: number } | null };
+
+export type PhaseSubscriptionVariables = Exact<{
+  gameId?: InputMaybe<Scalars['Int']['input']>;
+}>;
+
+
+export type PhaseSubscription = { __typename?: 'Subscription', phase?: { __typename?: 'BaseError' } | { __typename?: 'CustomError', message?: string | null, status?: number | null } | { __typename: 'SubscriptionPhaseSuccess', data: string } | null };
+
+export type RoundSubscriptionVariables = Exact<{
+  gameId?: InputMaybe<Scalars['Int']['input']>;
+}>;
+
+
+export type RoundSubscription = { __typename?: 'Subscription', round?: { __typename?: 'BaseError' } | { __typename?: 'CustomError', message?: string | null, status?: number | null } | { __typename: 'SubscriptionRoundSuccess', data: { __typename?: 'roundPayload', end?: any | null, id?: number | null, roundNumber?: number | null, start?: any | null, wordTranslateFrom?: string | null, wordTranslateFromId?: number | null, wordTranslateTo?: string | null, wordTranslateToId?: number | null } } | null };
+
 export type AddUsersMutationVariables = Exact<{
   name: Scalars['String']['input'];
 }>;
@@ -284,5 +422,11 @@ export const GamesDocument = {"kind":"Document","definitions":[{"kind":"Operatio
 export const RoundsPreparedDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"subscription","name":{"kind":"Name","value":"roundsPrepared"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"roundsPrepared"}}]}}]} as unknown as DocumentNode<RoundsPreparedSubscription, RoundsPreparedSubscriptionVariables>;
 export const PlayerJoinedDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"subscription","name":{"kind":"Name","value":"playerJoined"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"playerJoined"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"score"}}]}}]}}]} as unknown as DocumentNode<PlayerJoinedSubscription, PlayerJoinedSubscriptionVariables>;
 export const GameUpdatedDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"subscription","name":{"kind":"Name","value":"gameUpdated"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}},"defaultValue":{"kind":"IntValue","value":"0"}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"gameUpdated"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"langTranslateFrom"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"code"}},{"kind":"Field","name":{"kind":"Name","value":"id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"langTranslateTo"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"code"}},{"kind":"Field","name":{"kind":"Name","value":"id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"numRounds"}},{"kind":"Field","name":{"kind":"Name","value":"participants"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"player"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}}]}},{"kind":"Field","name":{"kind":"Name","value":"score"}},{"kind":"Field","name":{"kind":"Name","value":"playerId"}}]}}]}}]}}]} as unknown as DocumentNode<GameUpdatedSubscription, GameUpdatedSubscriptionVariables>;
+export const StartRoundDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"startRound"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"gameId"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}},"defaultValue":{"kind":"IntValue","value":"0"}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"langTranslateFrom"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}},"defaultValue":{"kind":"StringValue","value":"","block":false}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"langTranslateTo"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}},"defaultValue":{"kind":"StringValue","value":"","block":false}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"startRound"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"gameId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"gameId"}}},{"kind":"Argument","name":{"kind":"Name","value":"langTranslateFrom"},"value":{"kind":"Variable","name":{"kind":"Name","value":"langTranslateFrom"}}},{"kind":"Argument","name":{"kind":"Name","value":"langTranslateTo"},"value":{"kind":"Variable","name":{"kind":"Name","value":"langTranslateTo"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"MutationStartRoundSuccess"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"__typename"}},{"kind":"Field","name":{"kind":"Name","value":"data"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"wordTranslateFromId"}},{"kind":"Field","name":{"kind":"Name","value":"wordTranslateToId"}},{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"startTime"}}]}}]}},{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"CustomError"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"message"}},{"kind":"Field","name":{"kind":"Name","value":"status"}}]}}]}}]}}]} as unknown as DocumentNode<StartRoundMutation, StartRoundMutationVariables>;
+export const TimerDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"subscription","name":{"kind":"Name","value":"timer"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"gameId"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}},"defaultValue":{"kind":"IntValue","value":"0"}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"timer"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"gameId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"gameId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"CustomError"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"message"}},{"kind":"Field","name":{"kind":"Name","value":"status"}}]}},{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"SubscriptionTimerSuccess"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"__typename"}},{"kind":"Field","name":{"kind":"Name","value":"data"}}]}}]}}]}}]} as unknown as DocumentNode<TimerSubscription, TimerSubscriptionVariables>;
+export const PreCountDownDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"subscription","name":{"kind":"Name","value":"preCountDown"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"gameId"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}},"defaultValue":{"kind":"IntValue","value":"0"}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"preCountDown"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"gameId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"gameId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"CustomError"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"message"}},{"kind":"Field","name":{"kind":"Name","value":"status"}}]}},{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"SubscriptionPreCountDownSuccess"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"__typename"}},{"kind":"Field","name":{"kind":"Name","value":"data"}}]}}]}}]}}]} as unknown as DocumentNode<PreCountDownSubscription, PreCountDownSubscriptionVariables>;
+export const PostCountDownDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"subscription","name":{"kind":"Name","value":"postCountDown"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"gameId"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}},"defaultValue":{"kind":"IntValue","value":"0"}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"postCountDown"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"gameId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"gameId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"CustomError"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"message"}},{"kind":"Field","name":{"kind":"Name","value":"status"}}]}},{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"SubscriptionPostCountDownSuccess"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"__typename"}},{"kind":"Field","name":{"kind":"Name","value":"data"}}]}}]}}]}}]} as unknown as DocumentNode<PostCountDownSubscription, PostCountDownSubscriptionVariables>;
+export const PhaseDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"subscription","name":{"kind":"Name","value":"phase"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"gameId"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}},"defaultValue":{"kind":"IntValue","value":"0"}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"phase"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"gameId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"gameId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"CustomError"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"message"}},{"kind":"Field","name":{"kind":"Name","value":"status"}}]}},{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"SubscriptionPhaseSuccess"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"__typename"}},{"kind":"Field","name":{"kind":"Name","value":"data"}}]}}]}}]}}]} as unknown as DocumentNode<PhaseSubscription, PhaseSubscriptionVariables>;
+export const RoundDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"subscription","name":{"kind":"Name","value":"round"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"gameId"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}},"defaultValue":{"kind":"IntValue","value":"0"}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"round"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"gameId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"gameId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"CustomError"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"message"}},{"kind":"Field","name":{"kind":"Name","value":"status"}}]}},{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"SubscriptionRoundSuccess"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"__typename"}},{"kind":"Field","name":{"kind":"Name","value":"data"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"end"}},{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"roundNumber"}},{"kind":"Field","name":{"kind":"Name","value":"start"}},{"kind":"Field","name":{"kind":"Name","value":"wordTranslateFrom"}},{"kind":"Field","name":{"kind":"Name","value":"wordTranslateFromId"}},{"kind":"Field","name":{"kind":"Name","value":"wordTranslateTo"}},{"kind":"Field","name":{"kind":"Name","value":"wordTranslateToId"}}]}}]}}]}}]}}]} as unknown as DocumentNode<RoundSubscription, RoundSubscriptionVariables>;
 export const AddUsersDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"addUsers"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"name"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"addUsers"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"name"},"value":{"kind":"Variable","name":{"kind":"Name","value":"name"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}}]}}]}}]} as unknown as DocumentNode<AddUsersMutation, AddUsersMutationVariables>;
 export const GetUsersDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetUsers"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"users"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}}]}}]}}]} as unknown as DocumentNode<GetUsersQuery, GetUsersQueryVariables>;

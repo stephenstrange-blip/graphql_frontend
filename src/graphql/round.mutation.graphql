@@ -1,0 +1,27 @@
+mutation startRound(
+  $gameId: Int = 0
+  $langTranslateFrom: String = ""
+  $langTranslateTo: String = ""
+) {
+  startRound(
+    gameId: $gameId
+    langTranslateFrom: $langTranslateFrom
+    langTranslateTo: $langTranslateTo
+  ) {
+    ... on MutationStartRoundSuccess {
+      __typename
+      data {
+        wordTranslateFromId
+        wordTranslateToId
+        id
+        startTime
+      }
+    }
+    ... on CustomError {
+      message
+      status
+    }
+  }
+}
+
+
