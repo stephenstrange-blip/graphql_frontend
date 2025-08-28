@@ -1,4 +1,4 @@
-import { useState, useContext, useEffect, type MouseEvent} from "react";
+import { useState, useContext, useEffect} from "react";
 import { Form } from "react-router";
 import type { langTranslate } from "../types/types";
 import { SubmitContext } from "./context";
@@ -59,16 +59,8 @@ export function PreparationSection({ to, from, numRounds, onSubmit }: { to: lang
 
       <div className="flex flex-row gap-2 justify-center-safe items-center-safe">
         <button className="hover:bg-gray-300 p-2.5 rounded-[5px] min-w-15" type="submit" disabled={!!isFetching}>{isFetching ? "Applying..." : "Apply"}</button>
-        <button className="hover:bg-gray-300 p-2.5 rounded-[5px] min-w-15" onClick={startGame}>Start</button>
       </div>
     </Form>
   )
 }
 
-
-export function startGame(e: MouseEvent<HTMLButtonElement>) {
- e.preventDefault();
- e.stopPropagation();
-
- return
-}
