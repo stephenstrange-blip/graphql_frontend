@@ -15,7 +15,6 @@ export const client = new Client({
     fetchExchange,
     subscriptionExchange({
       forwardSubscription(fetchBody, operation) {
-        console.log("operation: ", operation)
         return {
           subscribe: (sink) => {
             const dispose = wsClient.subscribe(
