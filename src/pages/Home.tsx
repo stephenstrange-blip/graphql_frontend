@@ -1,6 +1,5 @@
 import type { Route } from "./+types/Home"
 import Header from '../components/Header'
-import { useNavigate } from "react-router"
 import { useMutation } from "urql"
 import { CreateGameDocument, JoinGameDocument } from "../graphql/generated"
 import { useGameStore } from "../components/context"
@@ -8,48 +7,53 @@ import { useRef, useState, type FormEventHandler, type FormEvent } from "react"
 import Dialog from "../components/Dialog"
 
 export default function Home(args: Route.ComponentProps) {
-  const navigate = useNavigate()
   const [createGameResult, createGame] = useMutation(CreateGameDocument)
   const [roomValue, setJoinRoomValue] = useState<string>("");
   const [joinGameResult, joinGame] = useMutation(JoinGameDocument)
-  const [error, setError] = useState<string>("");
-  const setGameId = useGameStore(state => state.setGameId)
+  const [error, setError] = useState<string | null>(null);
+  const { gameId, setGameId } = useGameStore()
   const dialogRef = useRef<HTMLDialogElement>(null);
 
+  if (gameId) {
+    location.href = "/play"
+  }
 
   const startGame = async () => {
-    setError("");
+    setError(null);
 
-    await createGame({ userId: Number(localStorage.getItem("userId")) ?? 0, numRounds: 2, langTranslateFromId: 1, langTranslateToId: 2 })
+    await createGame({ userId: Number(localStorage.getItem("userId")) ?? 0, numRounds: 2, langTranslateFromId: 1, langTranslateToId: 2 }).then(result => {
 
-    if (createGameResult.error)
-      return setError("Error: " + createGameResult.error.message)
-
-    if (createGameResult.data?.createGame?.__typename === "CustomError")
-      return setError(`Error (${createGameResult.data.createGame.status}): ${createGameResult.data?.createGame.message}`)
-
-    if (createGameResult.data?.createGame?.__typename === "MutationCreateGameSuccess") {
-      const { gameId, roundsPrepared, playerAdded } = createGameResult.data.createGame.data;
-
-      if (gameId && roundsPrepared && playerAdded) {
-        localStorage.setItem("userId", "0")
-        setGameId(gameId)
-        navigate("/play")
-      } else {
-        console.log(gameId, roundsPrepared, playerAdded)
-        return setError("Error: Some operations were unsuccessful")
+      if (result.error)
+        return setError("Error: " + result.error.message)
+  
+      if (result.data?.createGame?.__typename === "CustomError")
+        return setError(`Error (${result.data.createGame.status}): ${result.data?.createGame.message}`)
+  
+      if (result.data?.createGame?.__typename === "MutationCreateGameSuccess") {
+        const { gameId, roundsPrepared, playerAdded } = result.data.createGame.data;
+  
+        if ((gameId && gameId >= 0) && roundsPrepared && playerAdded) {
+          localStorage.setItem("userId", "0")
+          setGameId(gameId)
+          location.href = "/play"
+        } else {
+          console.log(gameId, roundsPrepared, playerAdded)
+          return setError("Error: Some operations were unsuccessful")
+        }
       }
-    }
+
+    })
+
   }
 
   const openDialog = () => {
-    setError("")
+    setError(null)
     if (dialogRef.current) dialogRef.current.showModal()
   }
 
   const joinRoom: FormEventHandler<HTMLFormElement> = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setError("")
+    setError(null)
 
     const gameId = new FormData(e.currentTarget).get("gameId")
 
@@ -68,7 +72,7 @@ export default function Home(args: Route.ComponentProps) {
         if (gameId && roundsPrepared && playerAdded) {
           localStorage.setItem("userId", "2")
           setGameId(gameId)
-          navigate("/play")
+          location.href = "/play"
         } else {
           console.log(gameId, roundsPrepared, playerAdded)
           setError("Error: Cannot join game")
@@ -83,7 +87,7 @@ export default function Home(args: Route.ComponentProps) {
   return (
     <>
       <div className="bg-[#e7e7e7] flex-col h-screen w-full flex items-center gap-y-0.5 ">
-        <p>{error}</p>
+        <p className={`bg-red-800 text-white w-full text-center p-1.5 ${error ?? 'hidden'}`}>{error}</p>
         <Header />
 
         <main className="size-full flex flex-col justify-center-safe items-center-safe">

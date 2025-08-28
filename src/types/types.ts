@@ -1,6 +1,7 @@
 // src/types.ts
 
-import type { AddUsersMutation, GetUsersQuery, GameQuery } from "../graphql/generated";
+import type { JSX } from "react";
+import type { AddUsersMutation, GetUsersQuery, GameQuery, RoundSubscription } from "../graphql/generated";
 
 export interface updateGameSettings {
   numRounds: number,
@@ -8,11 +9,20 @@ export interface updateGameSettings {
   to: number
 }
 
-export type State = { gameId: number | null }
-export type Action = {
-  setGameId: (gameId: State["gameId"]) => void
+export interface GameDisplay {
+  waiting: JSX.Element,
+  started: JSX.Element,
+  finished: JSX.Element
 }
 
+export type State = { gameId: number | null }
+export type Action = {
+  setGameId: (gameId: State["gameId"]) => void,
+  reset: () => void
+}
+
+export type RoundPayload = Extract<NonNullable<RoundSubscription["round"]>, { __typename: "SubscriptionRoundSuccess"}>["data"]
+export type RoundState = "idle" | "countDown" | "inRound" | "finished"
 export type User = NonNullable<GetUsersQuery["users"]>[0];
 export type addUser = AddUsersMutation["addUsers"]
 export type Participants = NonNullable<Extract<NonNullable<GameQuery["game"]>, { __typename: "QueryGameSuccess" }>["data"]["participants"]>
