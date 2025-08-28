@@ -8,9 +8,10 @@ import type { Action, State } from "../types/types";
 // Supposedly "curried" version or call signatures
 export const useGameStore = create<State & Action>()(
   persist<State & Action>(
-    (set, _get) => ({
+    (set, _get, store) => ({
       gameId: null,
-      setGameId: (gameId) => set({ gameId: gameId })
+      setGameId: (gameId) => set({ gameId: gameId }),
+      reset: () => {set(store.getInitialState())}
     }),
     {
       name: "gameId",
@@ -18,6 +19,5 @@ export const useGameStore = create<State & Action>()(
     },
   ),
 )
-
 
 export const SubmitContext = createContext(false);
