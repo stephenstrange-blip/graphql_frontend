@@ -1,20 +1,24 @@
 import { useState, type ReactNode } from "react"
 import { Form } from "react-router"
+import type { RoundState } from "../types/types"
 
-export function PlayerInput() {
+export function PlayerInput({ isRoundActive }: { isRoundActive: RoundState }) {
   const [answer, setAnswer] = useState('')
+  const inRound = isRoundActive === "inRound"
   return (
     <div>
-      <Form className="text-center">
+      <Form className="text-center" onSubmit={(e) => { inRound ? console.log(`Answered!`) : console.log("Not in Round phase!"); return }} >
         <label htmlFor="answer"></label>
         {/* TODO: REMOVE BORDER WHEN ACTIVE */}
         <input
+          disabled={!inRound}
           className=" min-w-input-constraint text-[48px] focus:border-none border-b-2  hover:"
           type="text"
           id="answer"
           name="answer"
           value={answer} onChange={e => setAnswer(e.currentTarget.value)}
         />
+        <button type="submit">Submit</button>
       </Form>
     </div>
   )
