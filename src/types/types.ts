@@ -15,14 +15,15 @@ export interface GameDisplay {
   finished: JSX.Element
 }
 
-export type State = { gameId: number | null }
+export type State = { gameId: number | null, status: keyof GameDisplay }
 export type Action = {
   setGameId: (gameId: State["gameId"]) => void,
+  setStatus: (status: State["status"]) => void
   reset: () => void
 }
 
 export type RoundPayload = Extract<NonNullable<RoundSubscription["round"]>, { __typename: "SubscriptionRoundSuccess"}>["data"]
-export type RoundState = "idle" | "countDown" | "inRound" | "finished"
+export type RoundState = "idle" | "countDown" | "inRound" | "finished" | "exit"
 export type User = NonNullable<GetUsersQuery["users"]>[0];
 export type addUser = AddUsersMutation["addUsers"]
 export type Participants = NonNullable<Extract<NonNullable<GameQuery["game"]>, { __typename: "QueryGameSuccess" }>["data"]["participants"]>

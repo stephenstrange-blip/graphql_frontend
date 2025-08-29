@@ -1,7 +1,7 @@
 import { createContext } from "react"
 import { create } from "zustand"
 import { persist, createJSONStorage } from "zustand/middleware"
-import type { Action, State } from "../types/types";
+import type { Action, langTranslate, State } from "../types/types";
 
 
 
@@ -10,8 +10,10 @@ export const useGameStore = create<State & Action>()(
   persist<State & Action>(
     (set, _get, store) => ({
       gameId: null,
+      status: "waiting",
       setGameId: (gameId) => set({ gameId: gameId }),
-      reset: () => {set(store.getInitialState())}
+      setStatus: (status) => set({ status: status }),
+      reset: () => { set(store.getInitialState()) }
     }),
     {
       name: "gameId",
@@ -20,4 +22,4 @@ export const useGameStore = create<State & Action>()(
   ),
 )
 
-export const SubmitContext = createContext(false);
+export const SubmitContext = createContext({ isFetching: false, langTranslateTo: null as langTranslate["code"] });
