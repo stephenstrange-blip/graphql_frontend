@@ -3,13 +3,16 @@ import { PlayerInput } from "./Input"
 import { PreCountDownDocument, PostCountDownDocument, RoundDocument, TimerDocument, type RoundPayload, PhaseDocument } from "../graphql/generated";
 import type { GameDisplay, RoundState } from "../types/types";
 import { sleep } from "../utils/utils";
+import { useGameStore } from "./context";
 
-export function RoundSection({ gameId }: { gameId: number, exitRound: React.Dispatch<React.SetStateAction<keyof GameDisplay>> }) {
+export function RoundSection({ gameId, exitRound }: { gameId: number, exitRound: React.Dispatch<React.SetStateAction<keyof GameDisplay>> }) {
   const [preCd] = useSubscription({ query: PreCountDownDocument, variables: { gameId } });
   const [postCd] = useSubscription({ query: PostCountDownDocument, variables: { gameId } });
   const [t] = useSubscription({ query: TimerDocument, variables: { gameId } });
   const [r] = useSubscription({ query: RoundDocument, variables: { gameId } })
   const [p] = useSubscription({ query: PhaseDocument, variables: { gameId } })
+
+  const setStatus = useGameStore(state => state.setStatus)
 
   // only need one error from any of the subscriptions
   const getCustomError = () => {
@@ -51,12 +54,22 @@ export function RoundSection({ gameId }: { gameId: number, exitRound: React.Disp
   if (p.data && p.data.phase?.__typename === "SubscriptionPhaseSuccess") {
     const phase = p.data.phase.data
 
-    if (!(["idle", "preCountDown", "inRound", "finished"].includes(phase)))
+    if (!(["idle", "preCountDown", "inRound", "finished", "exit"].includes(phase)))
       customError = { message: `Unknown round phase ${phase}. Please check Server`, status: 501, __typename: "CustomError" }
 
     roundState.phase = phase as RoundState
-  }
 
+    // let the client see the answer to last round 
+    // before changing the display
+    if (roundState.phase === "exit")
+      setTimeout(() => {
+        exitRound("finished");
+        // storing game status to display appropriate components
+        // incase of reconnecting clients post-game
+        setStatus("finished");
+        
+      }, 3000)
+  }
 
   if (error || customError) {
     sleep(4000).then(() => location.reload())
