@@ -2,6 +2,7 @@ import { useSubscription } from "urql";
 import { PlayerInput } from "./Input"
 import { PreCountDownDocument, PostCountDownDocument, RoundDocument, TimerDocument, type RoundPayload, PhaseDocument } from "../graphql/generated";
 import type { GameDisplay, RoundState } from "../types/types";
+import { sleep } from "../utils/utils";
 
 export function RoundSection({ gameId }: { gameId: number, exitRound: React.Dispatch<React.SetStateAction<keyof GameDisplay>> }) {
   const [preCd] = useSubscription({ query: PreCountDownDocument, variables: { gameId } });
@@ -27,6 +28,7 @@ export function RoundSection({ gameId }: { gameId: number, exitRound: React.Disp
   let customError = getCustomError()
 
   const roundState = {
+    id: null,
     preCountDown: 3,
     postCountDown: 3,
     timer: 0,
@@ -57,17 +59,15 @@ export function RoundSection({ gameId }: { gameId: number, exitRound: React.Disp
 
 
   if (error || customError) {
-    reload(4000).then(() => location.reload())
-    
+    sleep(4000).then(() => location.reload())
+
     return (
       <div className="flex flex-col justify-around items-center-safe w-full h-[70%] *:bg-amber-200">
         {error && <span>{error.message}</span>}
         {customError && <span>{customError ? `Error (${customError.status}): ${customError.message}` : ''}</span>}
       </div>
     )
-
   }
-
 
   function Answer() {
     if (roundState.round.wordTranslateTo)
@@ -77,36 +77,32 @@ export function RoundSection({ gameId }: { gameId: number, exitRound: React.Disp
   }
 
   return (
-    <div className="flex flex-col justify-around w-full h-[70%]">
-      <span className="flex flex-col">
-        <p>Timer: {roundState.timer}</p>
-        <p>Pre-CountDown: {roundState.preCountDown}</p>
-        <p>Post-CountDown: {roundState.postCountDown}</p>
-        <p>Phase: {roundState.phase}</p>
-      </span>
+    <div className="flex flex-col justify-baseline w-full h-[80%] gap-3">
+      <Timer timer={roundState.timer} />
+      <Countdown countDown={{ post: roundState.postCountDown, pre: roundState.preCountDown }} phase={roundState.phase} />
       <span className="flex flex-col border-1 items-center-safe h-[50%] justify-around">
-        {roundState.phase === "finished" ? <p>Finished!</p> :
-          <Countdown countDown={{ post: roundState.postCountDown, pre: roundState.preCountDown }} />}
-        <Timer timer={roundState.timer} />
         <Answer />
         <span>
           <p className="roundNumber text-center">Round: {roundState.round.roundNumber ?? ''}</p>
           <p className="from text-[48px]">{roundState.round.wordTranslateFrom ?? ""}</p>
         </span>
       </span>
-      <PlayerInput isRoundActive={roundState.phase} />
+      <PlayerInput isRoundActive={roundState.phase} roundId={roundState.id} />
     </div>
   )
 }
 
-function Countdown({ countDown }: { countDown: { post: number, pre: number } }) {
+function Countdown({ countDown, phase }: { countDown: { post: number, pre: number }, phase: RoundState }) {
 
   if ((countDown.post === null || countDown.post === undefined) && (countDown.pre === null || countDown.pre === undefined))
     return <></>
 
+  if (phase === "finished")
+    return <p className="text-center text-[32px]">Finished!</p>
+
   return (
-    <span className="countDown flex flex-row">
-      {(countDown.pre ?? countDown.post) <= 0
+    <span className="countDown flex flex-row justify-center-safe text-2xl">
+      {(countDown.pre ?? countDown.post) <= 0 && phase === "inRound"
         ? (<p>Go!!!</p>)
         : (<p>{`${countDown.pre ?? countDown.pre}`}</p>)
       }
@@ -119,12 +115,9 @@ function Timer({ timer }: { timer: number }) {
 
   let timeLeft = 10 - timer;
   return (
-    <span className="timer flex flex-row">
-      Time Left: <p className="pl-0.5">{`00:${timeLeft >= 10 ? timeLeft : `0${timeLeft}`}`}</p>
+    <span className="timer flex flex-row pl-5 p-3 w-fit">
+      <p className="pl-0.5 text-[28px]">{`00:${timeLeft >= 10 ? timeLeft : `0${timeLeft}`}`}</p>
     </span>
   )
 }
 
-async function reload(n: number) {
-  return await new Promise(resolve => setTimeout(resolve, n))
-}

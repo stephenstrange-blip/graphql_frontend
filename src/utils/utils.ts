@@ -29,3 +29,7 @@ export function parseFormData<T extends Record<keyof T, number>>(form: FormData,
   }
   return result
 }
+
+export async function sleep(n: number) {
+  return await new Promise(resolve => setTimeout(resolve, n))
+}
