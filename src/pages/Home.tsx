@@ -2,7 +2,7 @@ import type { Route } from "./+types/Home"
 import Header from '../components/Header'
 import { useMutation } from "urql"
 import { CreateGameDocument, JoinGameDocument } from "../graphql/generated"
-import { useGameStore } from "../components/context"
+import { useGameStore } from "../context/context"
 import { useRef, useState, type FormEventHandler, type FormEvent } from "react"
 import Dialog from "../components/Dialog"
 
