@@ -23,7 +23,7 @@ export type Action = {
 }
 
 export type RoundPayload = Extract<NonNullable<RoundSubscription["round"]>, { __typename: "SubscriptionRoundSuccess" }>["data"]
-export type RoundState = "idle" | "countDown" | "inRound" | "finished" | "exit"
+export type RoundPhase = "idle" | "preCountDown" | "inRound" | "finished" | "exit"
 export type User = NonNullable<GetUsersQuery["users"]>[0];
 export type addUser = AddUsersMutation["addUsers"]
 export type Participants = NonNullable<Extract<NonNullable<GameQuery["game"]>, { __typename: "QueryGameSuccess" }>["data"]["participants"]>

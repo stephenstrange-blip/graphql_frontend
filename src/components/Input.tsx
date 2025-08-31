@@ -1,13 +1,13 @@
 import { useContext, useRef, useState, type ReactNode } from "react"
 import { Form } from "react-router"
-import type { RoundState } from "../types/types"
+import type { RoundPhase } from "../types/types"
 import { sleep } from "../utils/utils"
 import { SubmitAnswerDocument, type SubmitAnswerMutationVariables } from "../graphql/generated"
 import { SubmitContext, useGameStore } from "../context/context"
 import { useMutation } from "urql"
 
 interface PlayerInputArgs {
-  isRoundActive: RoundState,
+  isRoundActive: RoundPhase,
   roundId: number | null | undefined,
   setIsCorrect: React.Dispatch<React.SetStateAction<boolean>>,
   isCorrect: boolean

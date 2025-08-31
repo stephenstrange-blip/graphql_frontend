@@ -1,7 +1,7 @@
-import { CombinedError, useSubscription, type SubscriptionHandler } from "urql";
+import { CombinedError, useSubscription } from "urql";
 import { PlayerInput } from "./Input"
 import { PreCountDownDocument, PostCountDownDocument, RoundDocument, TimerDocument, type RoundPayload, PhaseDocument, type CustomError, type PhaseSubscription } from "../graphql/generated";
-import type { GameDisplay, RoundState } from "../types/types";
+import type { GameDisplay, RoundPhase } from "../types/types";
 import { sleep } from "../utils/utils";
 import { useGameStore } from "../context/context";
 import { useState } from "react";
@@ -45,7 +45,7 @@ export function RoundSection({ gameId, exitRound }: { gameId: number, exitRound:
     postCountDown: 3,
     timer: 0,
     round: {} as RoundPayload,
-    phase: "idle" as RoundState,
+    phase: "idle" as RoundPhase,
   }
 
   if (r.data && r.data.round?.__typename === "SubscriptionRoundSuccess")
@@ -86,7 +86,7 @@ export function RoundSection({ gameId, exitRound }: { gameId: number, exitRound:
       }, 3000)
 
     // update the phase as usual
-    roundState.phase = newPhase as RoundState
+    roundState.phase = newPhase as RoundPhase
   }
 
   if (error || customError) {
@@ -126,7 +126,7 @@ function RoundError({ error, customError }: { error?: CombinedError, customError
   )
 }
 
-function Countdown({ countDown, phase }: { countDown: { post: number, pre: number }, phase: RoundState }) {
+function Countdown({ countDown, phase }: { countDown: { post: number, pre: number }, phase: RoundPhase }) {
 
   if ((countDown.post === null || countDown.post === undefined) && (countDown.pre === null || countDown.pre === undefined))
     return <></>
