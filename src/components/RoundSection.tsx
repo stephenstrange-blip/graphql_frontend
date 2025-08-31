@@ -1,16 +1,26 @@
-import { useSubscription } from "urql";
+import { CombinedError, useSubscription, type SubscriptionHandler } from "urql";
 import { PlayerInput } from "./Input"
-import { PreCountDownDocument, PostCountDownDocument, RoundDocument, TimerDocument, type RoundPayload, PhaseDocument } from "../graphql/generated";
+import { PreCountDownDocument, PostCountDownDocument, RoundDocument, TimerDocument, type RoundPayload, PhaseDocument, type CustomError, type PhaseSubscription } from "../graphql/generated";
 import type { GameDisplay, RoundState } from "../types/types";
 import { sleep } from "../utils/utils";
-import { useGameStore } from "./context";
+import { useGameStore } from "../context/context";
+import { useState } from "react";
 
 export function RoundSection({ gameId, exitRound }: { gameId: number, exitRound: React.Dispatch<React.SetStateAction<keyof GameDisplay>> }) {
+  const [isCorrect, setIsCorrect] = useState(false)
   const [preCd] = useSubscription({ query: PreCountDownDocument, variables: { gameId } });
   const [postCd] = useSubscription({ query: PostCountDownDocument, variables: { gameId } });
   const [t] = useSubscription({ query: TimerDocument, variables: { gameId } });
   const [r] = useSubscription({ query: RoundDocument, variables: { gameId } })
-  const [p] = useSubscription({ query: PhaseDocument, variables: { gameId } })
+  const [p] = useSubscription({ query: PhaseDocument, variables: { gameId } }, handlePhase)
+
+  // setting isCorrect to false every change of phase
+  // disables user input found inside the PlayerInput component
+  function handlePhase(previous: PhaseSubscription | undefined, current: PhaseSubscription): PhaseSubscription {
+    if (previous && (previous !== current))
+      setIsCorrect(false)
+    return current
+  }
 
   const setStatus = useGameStore(state => state.setStatus)
 
@@ -31,7 +41,6 @@ export function RoundSection({ gameId, exitRound }: { gameId: number, exitRound:
   let customError = getCustomError()
 
   const roundState = {
-    id: null,
     preCountDown: 3,
     postCountDown: 3,
     timer: 0,
@@ -52,41 +61,37 @@ export function RoundSection({ gameId, exitRound }: { gameId: number, exitRound:
     roundState.timer = t.data.timer.data
 
   if (p.data && p.data.phase?.__typename === "SubscriptionPhaseSuccess") {
-    const phase = p.data.phase.data
+    const newPhase = p.data.phase.data
 
-    if (!(["idle", "preCountDown", "inRound", "finished", "exit"].includes(phase)))
-      customError = { message: `Unknown round phase ${phase}. Please check Server`, status: 501, __typename: "CustomError" }
+    // exit game if an unknown phase somehow appears
+    if (!(["idle", "preCountDown", "inRound", "finished", "exit"].includes(newPhase))) {
+      roundState.phase = "exit"
+      return (<RoundError customError={
+        {
+          message: `Unknown round phase ${newPhase}. Please check Server`,
+          status: 501,
+          __typename: "CustomError"
+        }} />)
+    }
 
-    roundState.phase = phase as RoundState
+    // update the phase
+    roundState.phase = newPhase as RoundState
 
     // let the client see the answer to last round 
     // before changing the display
     if (roundState.phase === "exit")
       setTimeout(() => {
-        exitRound("finished");
-        // storing game status to display appropriate components
+        // store game status to display appropriate components
         // incase of reconnecting clients post-game
         setStatus("finished");
-        
+        exitRound("finished");
+
       }, 3000)
   }
 
   if (error || customError) {
     sleep(4000).then(() => location.reload())
-
-    return (
-      <div className="flex flex-col justify-around items-center-safe w-full h-[70%] *:bg-amber-200">
-        {error && <span>{error.message}</span>}
-        {customError && <span>{customError ? `Error (${customError.status}): ${customError.message}` : ''}</span>}
-      </div>
-    )
-  }
-
-  function Answer() {
-    if (roundState.round.wordTranslateTo)
-      return <span className="flex flex-col justify-center-safe items-center-safe">Answer is <p className="text-[38px]">{roundState.round.wordTranslateTo}</p></span>
-    else
-      return <></>
+    return (<RoundError error={error} customError={customError} />)
   }
 
   return (
@@ -94,13 +99,29 @@ export function RoundSection({ gameId, exitRound }: { gameId: number, exitRound:
       <Timer timer={roundState.timer} />
       <Countdown countDown={{ post: roundState.postCountDown, pre: roundState.preCountDown }} phase={roundState.phase} />
       <span className="flex flex-col border-1 items-center-safe h-[50%] justify-around">
-        <Answer />
+        <Answer wordTranslateTo={roundState.round.wordTranslateTo} />
         <span>
           <p className="roundNumber text-center">Round: {roundState.round.roundNumber ?? ''}</p>
           <p className="from text-[48px]">{roundState.round.wordTranslateFrom ?? ""}</p>
         </span>
       </span>
-      <PlayerInput isRoundActive={roundState.phase} roundId={roundState.id} />
+      <PlayerInput isRoundActive={roundState.phase} roundId={roundState.round.id} isCorrect={isCorrect} setIsCorrect={setIsCorrect} />
+    </div>
+  )
+}
+
+function Answer({ wordTranslateTo }: { wordTranslateTo: string | undefined | null }) {
+  if (wordTranslateTo)
+    return <span className="flex flex-col justify-center-safe items-center-safe">Answer is <p className="text-[38px]">{wordTranslateTo}</p></span>
+
+  return <></>
+}
+
+function RoundError({ error, customError }: { error?: CombinedError, customError?: CustomError }) {
+  return (
+    <div className="flex flex-col justify-around items-center-safe w-full h-[70%] *:bg-amber-200">
+      {error && <span>{error.message}</span>}
+      {customError && <span>{customError ? `Error (${customError.status}): ${customError.message}` : ''}</span>}
     </div>
   )
 }
@@ -126,6 +147,7 @@ function Countdown({ countDown, phase }: { countDown: { post: number, pre: numbe
 function Timer({ timer }: { timer: number }) {
   if (timer === undefined || timer === null) return <></>
 
+  // TODO: REFACTOR TO USE PADSTART()
   let timeLeft = 10 - timer;
   return (
     <span className="timer flex flex-row pl-5 p-3 w-fit">
