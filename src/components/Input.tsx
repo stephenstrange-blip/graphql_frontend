@@ -1,22 +1,87 @@
-import { useState, type ReactNode } from "react"
+import { useContext, useRef, useState, type ReactNode } from "react"
 import { Form } from "react-router"
 import type { RoundState } from "../types/types"
+import { sleep } from "../utils/utils"
+import { SubmitAnswerDocument, type SubmitAnswerMutationVariables } from "../graphql/generated"
+import { SubmitContext, useGameStore } from "../context/context"
+import { useMutation } from "urql"
 
-export function PlayerInput({ isRoundActive }: { isRoundActive: RoundState }) {
+interface PlayerInputArgs {
+  isRoundActive: RoundState,
+  roundId: number | null | undefined,
+  setIsCorrect: React.Dispatch<React.SetStateAction<boolean>>,
+  isCorrect: boolean
+
+}
+
+export function PlayerInput({ isRoundActive, roundId, isCorrect, setIsCorrect }: PlayerInputArgs) {
+  const [submitAnswerResult, submitAnswer] = useMutation(SubmitAnswerDocument)
+  const [inputError, setInputError] = useState<string | null>(null)
   const [answer, setAnswer] = useState('')
+  const inputRef = useRef<HTMLInputElement>(null)
+  const gameId = useGameStore(state => state.gameId)
+  const { langTranslateTo } = useContext(SubmitContext)
+
   const inRound = isRoundActive === "inRound"
+  const putHighlight = inRound && isCorrect
+  const disable = !inRound || isCorrect || submitAnswerResult.fetching
+
+  const handleSubmit: React.FormEventHandler<HTMLFormElement> = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setInputError(null)
+    const formData = new FormData(e.currentTarget);
+    const answer = formData.get("answer") as string
+
+    if (!answer || !(answer.toString().trim()))
+      return setInputError("No input detected!")
+
+    if (!roundId) {
+      sleep(4000).then(() => location.reload())
+      return setInputError("No roundID detected. This is a server error. Reloading page...")
+    }
+
+    const payload: SubmitAnswerMutationVariables = {
+      answer: answer,
+      playerId: Number(localStorage.getItem("userId")) ?? 0,
+      gameId: gameId ?? 0,
+      langTranslateTo: langTranslateTo ?? "eng",
+      roundId,
+    }
+
+    await submitAnswer(payload).then(result => {
+      if (result.error)
+        setInputError("Error: " + result.error)
+
+      // Throw an error if wrong answer
+      if (result.data?.submitAnswer?.__typename === "CustomError")
+        setInputError(`Error${result.data.submitAnswer.status}: ${result.data.submitAnswer.message}`)
+
+      // Only disable when answer is correct
+      if (result.data?.submitAnswer?.__typename === "MutationSubmitAnswerSuccess" && inRound)
+        if (inputRef.current) {
+          setInputError(null)
+          setIsCorrect(true)
+        }
+    })
+    return
+  }
+
   return (
     <div>
-      <Form className="text-center" onSubmit={(e) => { inRound ? console.log(`Answered!`) : console.log("Not in Round phase!"); return }} >
+      <Form className="text-center relative" onSubmit={handleSubmit} >
         <label htmlFor="answer"></label>
-        {/* TODO: REMOVE BORDER WHEN ACTIVE */}
-        <input
-          disabled={!inRound}
-          className=" min-w-input-constraint text-[48px] focus:border-none border-b-2  hover:"
+        <p className="absolute top-0 right-0 bg-amber-700 text-amber-100 text-[15px]">{inputError}</p>
+        <input ref={inputRef}
+          className={" disabled:border-b-1 min-w-input-constraint text-[48px] focus:border-b-gray-200 border-b-2 outline-0 " + (putHighlight ? "border-green-600 focus:border-green-600" : "")}
+          disabled={disable}
           type="text"
           id="answer"
           name="answer"
-          value={answer} onChange={e => setAnswer(e.currentTarget.value)}
+          value={inRound ? answer : ''}
+          onChange={e => {
+            setInputError(null)
+            setAnswer(e.currentTarget.value)
+          }}
         />
         <button type="submit">Submit</button>
       </Form>
