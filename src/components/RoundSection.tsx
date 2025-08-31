@@ -74,12 +74,9 @@ export function RoundSection({ gameId, exitRound }: { gameId: number, exitRound:
         }} />)
     }
 
-    // update the phase
-    roundState.phase = newPhase as RoundState
-
     // let the client see the answer to last round 
     // before changing the display
-    if (roundState.phase === "exit")
+    if (newPhase === "exit")
       setTimeout(() => {
         // store game status to display appropriate components
         // incase of reconnecting clients post-game
@@ -87,6 +84,9 @@ export function RoundSection({ gameId, exitRound }: { gameId: number, exitRound:
         exitRound("finished");
 
       }, 3000)
+
+    // update the phase as usual
+    roundState.phase = newPhase as RoundState
   }
 
   if (error || customError) {
@@ -131,15 +131,24 @@ function Countdown({ countDown, phase }: { countDown: { post: number, pre: numbe
   if ((countDown.post === null || countDown.post === undefined) && (countDown.pre === null || countDown.pre === undefined))
     return <></>
 
-  if (phase === "finished")
-    return <p className="text-center text-[32px]">Finished!</p>
+  function Information() {
+    if (phase === "finished" || phase === "exit")
+      return <p className="text-center text-[32px]">Finished!</p>
+
+    else if (phase === "idle")
+      return <></>
+
+    else if ((countDown.pre ?? countDown.post) <= 0 && phase === "inRound")
+      return <p>Go!!!</p>
+
+    else if ((countDown.pre ?? countDown.post) > 0 && phase === "preCountDown")
+      return (<p>{`${countDown.pre ?? countDown.pre}`}</p>)
+
+  }
 
   return (
     <span className="countDown flex flex-row justify-center-safe text-2xl">
-      {(countDown.pre ?? countDown.post) <= 0 && phase === "inRound"
-        ? (<p>Go!!!</p>)
-        : (<p>{`${countDown.pre ?? countDown.pre}`}</p>)
-      }
+      <Information />
     </span>
   )
 }
@@ -147,11 +156,10 @@ function Countdown({ countDown, phase }: { countDown: { post: number, pre: numbe
 function Timer({ timer }: { timer: number }) {
   if (timer === undefined || timer === null) return <></>
 
-  // TODO: REFACTOR TO USE PADSTART()
-  let timeLeft = 10 - timer;
+  let timeLeft = `${10 - timer}`.padStart(2, "0");
   return (
     <span className="timer flex flex-row pl-5 p-3 w-fit">
-      <p className="pl-0.5 text-[28px]">{`00:${timeLeft >= 10 ? timeLeft : `0${timeLeft}`}`}</p>
+      <p className="pl-0.5 text-[28px]">{`00:${timeLeft}`}</p>
     </span>
   )
 }
