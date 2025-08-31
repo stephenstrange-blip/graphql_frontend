@@ -24,4 +24,27 @@ mutation startRound(
   }
 }
 
-
+mutation submitAnswer(
+  $answer: String = ""
+  $gameId: Int = 0
+  $langTranslateTo: String = ""
+  $playerId: Int = 0
+  $roundId: Int = 4
+) {
+  submitAnswer(
+    answer: $answer
+    gameId: $gameId
+    langTranslateTo: $langTranslateTo
+    playerId: $playerId
+    roundId: $roundId
+  ) {
+    ... on CustomError {
+      message
+      status
+    }
+    ... on MutationSubmitAnswerSuccess {
+      __typename
+      data
+    }
+  }
+}
