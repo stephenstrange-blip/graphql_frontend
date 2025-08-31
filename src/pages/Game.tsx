@@ -5,8 +5,8 @@ import { useMutation, useQuery, useSubscription } from "urql"
 import { GameDocument, GameUpdatedDocument, UpdateGameDocument } from "../graphql/generated"
 import type { langTranslate, Participants, updateGameSettings } from "../types/types"
 import { filterParticipants, parseFormData } from "../utils/utils"
-import { GameSection } from "../components/GameSection"
-import { PlayerSection, OpponentSection } from "../components/ParticipantSection"
+import { GameSection } from "./sections/GameSection"
+import { PlayerSection, OpponentSection } from "./sections/ParticipantSection"
 
 export default function GamePage(args: Route.ComponentProps) {
   const gameId = useGameStore(state => state.gameId);
@@ -43,9 +43,9 @@ export default function GamePage(args: Route.ComponentProps) {
     if (_from === _to)
       return setError("Cannot translate from the same language!")
 
-    if (numRounds === _numRounds && Number(from.id) === _from && Number(to.id) === _to) 
+    if (numRounds === _numRounds && Number(from.id) === _from && Number(to.id) === _to)
       return setError("No changes detected!")
-    
+
     const payload = {
       gameId: gameId || 1,
       numRounds: _numRounds,
@@ -54,12 +54,12 @@ export default function GamePage(args: Route.ComponentProps) {
     }
 
     // Triggers the subscription event in the backend
-    updateGame(payload)
-
-    if (updateGameResult.error)
-      return setError("Error: " + updateGameResult.error)
-    if (updateGameResult.data?.changeGameSetting?.__typename === "CustomError")
-      return setError(`Error (${updateGameResult.data.changeGameSetting.status}): ${updateGameResult.data?.changeGameSetting.message}`)
+    updateGame(payload).then(result => {
+      if (result.error)
+        return setError("Error: " + result.error)
+      if (result.data?.changeGameSetting?.__typename === "CustomError")
+        return setError(`Error (${result.data.changeGameSetting.status}): ${result.data?.changeGameSetting.message}`)
+    })
   }
 
   return (
@@ -68,7 +68,7 @@ export default function GamePage(args: Route.ComponentProps) {
       <main className="size-full grid grid-rows-2 grid-cols-5 [&>*]:border-1 p-[1rem] gap-4">
         <PlayerSection player={player} />
         <OpponentSection opponents={opponents} numRounds={numRounds} toCode={to.code ?? ""} fromCode={from.code ?? ""} />
-        <SubmitContext value={{ isFetching: updateGameResult.fetching, langTranslateTo: to.code}}>
+        <SubmitContext value={{ isFetching: updateGameResult.fetching, langTranslateTo: to.code }}>
           <GameSection to={to} from={from} numRounds={numRounds} applyChanges={applyChanges} setError={setError} />
         </SubmitContext>
       </main>
