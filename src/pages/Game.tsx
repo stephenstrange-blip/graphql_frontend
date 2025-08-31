@@ -1,6 +1,6 @@
 import type { Route } from "./+types/Game"
 import { useState } from "react"
-import { SubmitContext, useGameStore } from "../components/context"
+import { SubmitContext, useGameStore } from "../context/context"
 import { useMutation, useQuery, useSubscription } from "urql"
 import { GameDocument, GameUpdatedDocument, UpdateGameDocument } from "../graphql/generated"
 import type { langTranslate, Participants, updateGameSettings } from "../types/types"
@@ -65,10 +65,10 @@ export default function GamePage(args: Route.ComponentProps) {
   return (
     <>
       <p className={`bg-red-800 text-white w-full text-center p-1.5 ${error ?? 'hidden'}`}>{error}</p>
-      <main className="size-full grid grid-rows-2 grid-cols-4 [&>*]:border-1 p-[1rem] gap-6">
+      <main className="size-full grid grid-rows-2 grid-cols-5 [&>*]:border-1 p-[1rem] gap-4">
         <PlayerSection player={player} />
         <OpponentSection opponents={opponents} numRounds={numRounds} toCode={to.code ?? ""} fromCode={from.code ?? ""} />
-        <SubmitContext value={updateGameResult.fetching}>
+        <SubmitContext value={{ isFetching: updateGameResult.fetching, langTranslateTo: to.code}}>
           <GameSection to={to} from={from} numRounds={numRounds} applyChanges={applyChanges} setError={setError} />
         </SubmitContext>
       </main>

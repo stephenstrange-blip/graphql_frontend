@@ -1,13 +1,13 @@
-import { useState, useContext, useEffect} from "react";
+import { useState, useContext, useEffect } from "react";
 import { Form } from "react-router";
 import type { langTranslate } from "../types/types";
-import { SubmitContext } from "./context";
+import { SubmitContext } from "../context/context";
 import { HorizontalNumberInput } from "./Input";
 import { Dropdown } from "./Dropdown";
 
 export function PreparationSection({ to, from, numRounds, onSubmit }: { to: langTranslate, from: langTranslate, numRounds: number, onSubmit: React.FormEventHandler<HTMLFormElement> }) {
   const [value, setValue] = useState<number>(numRounds);
-  const isFetching = useContext(SubmitContext)
+  const { isFetching } = useContext(SubmitContext)
 
   const langugageNames = {
     eng: "english",

@@ -3,7 +3,7 @@ import type { langTranslate, GameDisplay } from "../types/types";
 import { PreparationSection } from "./PreparationSection";
 import { ProgressSection } from "./ProgressSection";
 import { RoundSection } from "./RoundSection";
-import { useGameStore } from "./context";
+import { useGameStore } from "../context/context";
 
 import { useMutation } from "urql";
 import { StartRoundDocument } from "../graphql/generated";
