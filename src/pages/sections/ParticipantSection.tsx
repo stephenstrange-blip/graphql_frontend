@@ -1,4 +1,4 @@
-import githubIcon from "../assets/github-original.svg"
+import githubIcon from "../../assets/github-original.svg"
 import type { Participants, Participant } from "../../types/types"
 
 export function PlayerSection({ player }: { player: Participant }) {

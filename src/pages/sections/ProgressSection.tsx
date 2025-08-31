@@ -1,4 +1,4 @@
-import githubIcon from "../assets/github-original.svg"
+import githubIcon from "../../assets/github-original.svg"
 
 export function ProgressSection() {
   return (
