@@ -1,10 +1,13 @@
 import { CombinedError, useSubscription } from "urql";
-import { PlayerInput } from "./Input"
-import { PreCountDownDocument, PostCountDownDocument, RoundDocument, TimerDocument, type RoundPayload, PhaseDocument, type CustomError, type PhaseSubscription } from "../graphql/generated";
-import type { GameDisplay, RoundPhase } from "../types/types";
-import { sleep } from "../utils/utils";
-import { useGameStore } from "../context/context";
+import { PlayerInput } from "../../components/Input"
+import { PreCountDownDocument, PostCountDownDocument, RoundDocument, TimerDocument, type RoundPayload, PhaseDocument, type CustomError, type PhaseSubscription } from "../../graphql/generated";
+import type { GameDisplay, RoundPhase } from "../../types/types";
+import { sleep } from "../../utils/utils";
+import { useGameStore } from "../../context/context";
 import { useState } from "react";
+import Countdown from "../../components/Countdown";
+import Timer from "../../components/Timer";
+import Answer from "../../components/Answer";
 
 export function RoundSection({ gameId, exitRound }: { gameId: number, exitRound: React.Dispatch<React.SetStateAction<keyof GameDisplay>> }) {
   const [isCorrect, setIsCorrect] = useState(false)
@@ -110,13 +113,6 @@ export function RoundSection({ gameId, exitRound }: { gameId: number, exitRound:
   )
 }
 
-function Answer({ wordTranslateTo }: { wordTranslateTo: string | undefined | null }) {
-  if (wordTranslateTo)
-    return <span className="flex flex-col justify-center-safe items-center-safe">Answer is <p className="text-[38px]">{wordTranslateTo}</p></span>
-
-  return <></>
-}
-
 function RoundError({ error, customError }: { error?: CombinedError, customError?: CustomError }) {
   return (
     <div className="flex flex-col justify-around items-center-safe w-full h-[70%] *:bg-amber-200">
@@ -126,41 +122,5 @@ function RoundError({ error, customError }: { error?: CombinedError, customError
   )
 }
 
-function Countdown({ countDown, phase }: { countDown: { post: number, pre: number }, phase: RoundPhase }) {
 
-  if ((countDown.post === null || countDown.post === undefined) && (countDown.pre === null || countDown.pre === undefined))
-    return <></>
-
-  function Information() {
-    if (phase === "finished" || phase === "exit")
-      return <p className="text-center text-[32px]">Finished!</p>
-
-    else if (phase === "idle")
-      return <></>
-
-    else if ((countDown.pre ?? countDown.post) <= 0 && phase === "inRound")
-      return <p>Go!!!</p>
-
-    else if ((countDown.pre ?? countDown.post) > 0 && phase === "preCountDown")
-      return (<p>{`${countDown.pre ?? countDown.pre}`}</p>)
-
-  }
-
-  return (
-    <span className="countDown flex flex-row justify-center-safe text-2xl">
-      <Information />
-    </span>
-  )
-}
-
-function Timer({ timer }: { timer: number }) {
-  if (timer === undefined || timer === null) return <></>
-
-  let timeLeft = `${10 - timer}`.padStart(2, "0");
-  return (
-    <span className="timer flex flex-row pl-5 p-3 w-fit">
-      <p className="pl-0.5 text-[28px]">{`00:${timeLeft}`}</p>
-    </span>
-  )
-}
 

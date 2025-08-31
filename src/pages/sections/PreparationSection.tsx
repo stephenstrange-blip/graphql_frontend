@@ -1,9 +1,9 @@
 import { useState, useContext, useEffect } from "react";
 import { Form } from "react-router";
-import type { langTranslate } from "../types/types";
-import { SubmitContext } from "../context/context";
-import { HorizontalNumberInput } from "./Input";
-import { Dropdown } from "./Dropdown";
+import type { langTranslate } from "../../types/types";
+import { SubmitContext } from "../../context/context";
+import { HorizontalNumberInput } from "../../components/Input";
+import { Dropdown } from "../../components/Dropdown";
 
 export function PreparationSection({ to, from, numRounds, onSubmit }: { to: langTranslate, from: langTranslate, numRounds: number, onSubmit: React.FormEventHandler<HTMLFormElement> }) {
   const [value, setValue] = useState<number>(numRounds);

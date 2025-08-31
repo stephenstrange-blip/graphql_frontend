@@ -1,12 +1,12 @@
-import { useState, type JSX, type MouseEvent, type MouseEventHandler } from "react";
-import type { langTranslate, GameDisplay } from "../types/types";
+import { useState} from "react";
+import type { langTranslate, GameDisplay } from "../../types/types";
 import { PreparationSection } from "./PreparationSection";
 import { ProgressSection } from "./ProgressSection";
 import { RoundSection } from "./RoundSection";
-import { useGameStore } from "../context/context";
+import { useGameStore } from "../../context/context";
 
 import { useMutation } from "urql";
-import { StartRoundDocument } from "../graphql/generated";
+import { StartRoundDocument } from "../../graphql/generated";
 
 export function GameSection({ to, from, numRounds, applyChanges, setError }: { to: langTranslate, from: langTranslate, numRounds: number, applyChanges: React.FormEventHandler<HTMLFormElement>, setError: React.Dispatch<React.SetStateAction<string | null>> }) {
   const { gameId, reset: resetState, setStatus, status } = useGameStore()
