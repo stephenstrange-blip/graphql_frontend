@@ -1,18 +1,10 @@
-import { useContext, useRef, useState, type ReactNode } from "react"
+import { useContext, useRef, useState} from "react"
 import { Form } from "react-router"
-import type { RoundPhase } from "../types/types"
+import type { HorizontalNumberInputArgs, PlayerInputArgs } from "../types/types"
 import { sleep } from "../utils/utils"
 import { SubmitAnswerDocument, type SubmitAnswerMutationVariables } from "../graphql/generated"
 import { SubmitContext, useGameStore } from "../context/context"
 import { useMutation } from "urql"
-
-interface PlayerInputArgs {
-  isRoundActive: RoundPhase,
-  roundId: number | null | undefined,
-  setIsCorrect: React.Dispatch<React.SetStateAction<boolean>>,
-  isCorrect: boolean
-
-}
 
 export function PlayerInput({ isRoundActive, roundId, isCorrect, setIsCorrect }: PlayerInputArgs) {
   const [submitAnswerResult, submitAnswer] = useMutation(SubmitAnswerDocument)
@@ -89,18 +81,32 @@ export function PlayerInput({ isRoundActive, roundId, isCorrect, setIsCorrect }:
   )
 }
 
-export function HorizontalNumberInput({ children, id, onChange, value }:
-  { children?: ReactNode, id: string, value: number, onChange: React.Dispatch<React.SetStateAction<number>> }) {
+export function HorizontalNumberInput({ children, id, onChange, value }: HorizontalNumberInputArgs) {
+
+  const increment = () => {
+    onChange(settings => {
+      const { numRounds, ...others } = settings;
+      return { numRounds: numRounds < 10 ? numRounds + 1 : numRounds, ...others }
+    })
+  }
+
+  const decrement = () => {
+    onChange(settings => {
+      const { numRounds, ...others } = settings;
+      return { numRounds: numRounds > 1 ? numRounds - 1: numRounds, ...others }
+    })
+  }
+
   return (
     <div className="flex flex-col gap-5">
       {/* for labels - if any */}
       {children}
       <div className="flex-row flex">
-        <div onClick={() => onChange(v => v === 1 ? v : v - 1)}>
-          <p className="p-2.5 pr-5 pl-5 cursor-pointer hover:bg-gray-300 rounded-3xl">-</p>
+        <div onClick={decrement} className={`${value <= 1 ? "pointer-events-none": ""}`}> 
+          <p  className="p-2.5 pr-5 pl-5 cursor-pointer hover:bg-gray-300 rounded-3xl">-</p>
         </div>
         <input className="text-center focus:border-0 max-w-fit w-20 pl-0.5" type="number" id={id} name={id} value={value} key={value} readOnly />
-        <div onClick={() => onChange(v => v === 10 ? v : v + 1)}>
+        <div onClick={increment} className={`${value >= 10 ? "pointer-events-none": ""}`}>
           <p className="p-2.5 pr-5 pl-5 cursor-pointer hover:bg-gray-300 rounded-3xl">+</p>
         </div>
       </div>
