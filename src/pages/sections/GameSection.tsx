@@ -14,7 +14,10 @@ export function GameSection({ to, from, numRounds, applyChanges, setError, start
   const [roundsResult, setRounds] = useMutation(StartRoundDocument)
   const { isFetching } = useContext(SubmitContext)
 
-  if (!gameId) { location.href = "/" };
+  if (!gameId) { 
+    location.href = "/" 
+    return <></>
+  };
 
   const startGame = () => {
     setRounds({ gameId, langTranslateTo: to.code, langTranslateFrom: from.code }).then(result => {
@@ -54,7 +57,7 @@ export function GameSection({ to, from, numRounds, applyChanges, setError, start
     ),
     started: (
       <>
-        <RoundSection gameId={gameId ?? 0} exitRound={setGameStatus} />
+        <RoundSection gameId={gameId} exitRound={setGameStatus} />
         <ProgressSection />
       </>
     ),
