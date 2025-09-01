@@ -105,7 +105,7 @@ export function HorizontalNumberInput({ children, id, onChange, value }: Horizon
         <div onClick={decrement} className={`${value <= 1 ? "pointer-events-none": ""}`}> 
           <p  className="p-2.5 pr-5 pl-5 cursor-pointer hover:bg-gray-300 rounded-3xl">-</p>
         </div>
-        <input className="text-center focus:border-0 max-w-fit w-20 pl-0.5" type="number" id={id} name={id} value={value} key={value} readOnly />
+        <input className="text-center focus:border-0 max-w-fit w-20 pl-0.5 pointer-events-none" type="text" inputMode="numeric" pattern="[0-9]*" id={id} name={id} value={value} key={value} readOnly={true} />
         <div onClick={increment} className={`${value >= 10 ? "pointer-events-none": ""}`}>
           <p className="p-2.5 pr-5 pl-5 cursor-pointer hover:bg-gray-300 rounded-3xl">+</p>
         </div>
