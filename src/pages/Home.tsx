@@ -33,7 +33,6 @@ export default function Home(args: Route.ComponentProps) {
         const { gameId, roundsPrepared, playerAdded } = result.data.createGame.data;
   
         if ((gameId && gameId >= 0) && roundsPrepared && playerAdded) {
-          localStorage.setItem("userId", "0")
           setGameId(gameId)
           location.href = "/play"
         } else {
@@ -70,7 +69,6 @@ export default function Home(args: Route.ComponentProps) {
         const { gameId, roundsPrepared, playerAdded } = result.data.joinGame.data;
 
         if (gameId && roundsPrepared && playerAdded) {
-          localStorage.setItem("userId", "2")
           setGameId(gameId)
           location.href = "/play"
         } else {
@@ -92,10 +90,9 @@ export default function Home(args: Route.ComponentProps) {
 
         <main className="size-full flex flex-col justify-center-safe items-center-safe">
           <p className="text-[30px] text-[#000000]">Welcome</p>
-          <p>A quick tutorial on how to play the game</p>
           <div className="flex flex-row">
-            <p className={`pl-[5px] pr-[5px] hover:text-gray-700 ${createGameResult.fetching ? "pointer-events-none" : "pointer-events-auto"}`} onClick={openDialog}>Join</p> or
-            <p className={`pl-[5px] pr-[5px] hover:text-gray-700 ${createGameResult.fetching ? "pointer-events-none" : "pointer-events-auto"}`} onClick={startGame}>Start</p> a game
+            <p className={`cursor-pointer rounded-[15px] pl-[5px] pr-[5px] hover:text-gray-700 hover:shadow-[0_.5rem_.5rem_rgba(0,0,0,0.25)_inset] ${createGameResult.fetching ? "pointer-events-none" : "pointer-events-auto"}`} onClick={openDialog}>Join</p> or
+            <p className={`cursor-pointer rounded-[15px] pl-[5px] pr-[5px] hover:text-gray-700 hover:shadow-[0_.5rem_.5rem_rgba(0,0,0,0.25)_inset] ${createGameResult.fetching ? "pointer-events-none" : "pointer-events-auto"}`} onClick={startGame}>Start</p> a game
           </div>
         </main>
       </div>
