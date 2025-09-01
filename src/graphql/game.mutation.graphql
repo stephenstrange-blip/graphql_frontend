@@ -26,24 +26,26 @@ mutation createGame(
 }
 
 mutation updateGame(
-  $numRounds: Int = 1
-  $langTranslateToId: Int = 2
-  $langTranslateFromId: Int = 1
   $gameId: Int = 1
+  $langTranslateFromId: Int = 1
+  $langTranslateToId: Int = 2
+  $numRounds: Int = 1
+  $status: Int = 0
 ) {
   changeGameSetting(
     gameId: $gameId
     langTranslateFromId: $langTranslateFromId
     langTranslateToId: $langTranslateToId
     numRounds: $numRounds
+    status: $status
   ) {
-    ... on MutationChangeGameSettingSuccess {
-      __typename
-      data
-    }
     ... on CustomError {
       message
       status
+    }
+    ... on MutationChangeGameSettingSuccess {
+      __typename
+      data
     }
   }
 }
