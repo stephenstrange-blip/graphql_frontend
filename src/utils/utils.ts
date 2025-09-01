@@ -1,7 +1,7 @@
 import type { Participant, Participants } from "../types/types";
 
 export function filterParticipants(participants: Participants): { player: Participant, opponents: Participants } {
-  let player: Participant = {}, opponents = [], userId = localStorage.getItem("userId");
+  let player: Participant = {}, opponents = [], userId = sessionStorage.getItem("userId");
 
   if (participants) {
     for (let participant of participants) {

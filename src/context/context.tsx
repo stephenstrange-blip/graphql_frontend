@@ -17,7 +17,7 @@ export const useGameStore = create<State & Action>()(
     }),
     {
       name: "gameId",
-      storage: createJSONStorage(() => localStorage)
+      storage: createJSONStorage(() => sessionStorage)
     },
   ),
 )

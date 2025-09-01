@@ -20,18 +20,21 @@ export default function Home(args: Route.ComponentProps) {
 
   const startGame = async () => {
     setError(null);
+    const userId = sessionStorage.getItem("userId")
 
-    await createGame({ userId: Number(localStorage.getItem("userId")) ?? 0, numRounds: 2, langTranslateFromId: 1, langTranslateToId: 2 }).then(result => {
+    if (!userId) return setError("Error: No userId found!")
+
+    await createGame({ userId: Number(userId), numRounds: 2, langTranslateFromId: 1, langTranslateToId: 2 }).then(result => {
 
       if (result.error)
         return setError("Error: " + result.error.message)
-  
+
       if (result.data?.createGame?.__typename === "CustomError")
         return setError(`Error (${result.data.createGame.status}): ${result.data?.createGame.message}`)
-  
+
       if (result.data?.createGame?.__typename === "MutationCreateGameSuccess") {
         const { gameId, roundsPrepared, playerAdded } = result.data.createGame.data;
-  
+
         if ((gameId && gameId >= 0) && roundsPrepared && playerAdded) {
           setGameId(gameId)
           location.href = "/play"
@@ -55,8 +58,15 @@ export default function Home(args: Route.ComponentProps) {
     setError(null)
 
     const gameId = new FormData(e.currentTarget).get("gameId")
+    const userId = sessionStorage.getItem("userId")
 
-    joinGame({ gameId: Number(gameId), userId: Number(localStorage.getItem("userId")) ?? 0 }).then(result => {
+    if (!userId) {
+      setJoinRoomValue("")
+      dialogRef!.current!.close()
+      return setError("Error: No userId found!")
+    }
+
+    joinGame({ gameId: Number(gameId), userId: Number(userId) }).then(result => {
 
       if (result.error)
         setError("Error: " + result.error.message)
@@ -64,21 +74,20 @@ export default function Home(args: Route.ComponentProps) {
       if (result.data?.joinGame?.__typename === "CustomError")
         setError(`Error (${result.data.joinGame.status}): ${result.data?.joinGame.message}`)
 
-      console.log(result)
       if (result.data?.joinGame?.__typename === "MutationJoinGameSuccess") {
         const { gameId, roundsPrepared, playerAdded } = result.data.joinGame.data;
 
         if (gameId && roundsPrepared && playerAdded) {
           setGameId(gameId)
-          location.href = "/play"
+          return location.href = "/play"
         } else {
           console.log(gameId, roundsPrepared, playerAdded)
           setError("Error: Cannot join game")
         }
       }
+      setJoinRoomValue("")
+      return dialogRef!.current!.close()
     })
-    setJoinRoomValue("")
-    return dialogRef!.current!.close()
 
   }
 
