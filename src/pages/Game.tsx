@@ -33,6 +33,7 @@ export default function GamePage(args: Route.ComponentProps) {
 
   const { player, opponents } = filterParticipants(participants)
 
+  // This handler is for when user changes game settings prior to game
   const applyChanges: React.FormEventHandler<HTMLFormElement> = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError(null)
@@ -60,6 +61,27 @@ export default function GamePage(args: Route.ComponentProps) {
       if (result.data?.changeGameSetting?.__typename === "CustomError")
         return setError(`Error (${result.data.changeGameSetting.status}): ${result.data?.changeGameSetting.message}`)
     })
+
+  }
+  // This handler is for when a game ends, and user wants to start another game
+  const startAnother = () => {
+
+    if (!from.id || !to.id)
+      return setError("Error: There's no from and to language ID. Reload the page")
+
+    const payload = {
+      gameId: gameId || 1,
+      numRounds: numRounds,
+      langTranslateFromId: Number(from.id),
+      langTranslateToId: Number(to.id),
+    }
+
+    updateGame(payload).then(result => {
+      if (result.error)
+        return setError("Error: " + result.error)
+      if (result.data?.changeGameSetting?.__typename === "CustomError")
+        return setError(`Error (${result.data.changeGameSetting.status}): ${result.data?.changeGameSetting.message}`)
+    })
   }
 
   return (
@@ -69,7 +91,7 @@ export default function GamePage(args: Route.ComponentProps) {
         <PlayerSection player={player} />
         <OpponentSection opponents={opponents} numRounds={numRounds} toCode={to.code ?? ""} fromCode={from.code ?? ""} />
         <SubmitContext value={{ isFetching: updateGameResult.fetching, langTranslateTo: to.code }}>
-          <GameSection to={to} from={from} numRounds={numRounds} applyChanges={applyChanges} setError={setError} />
+          <GameSection to={to} from={from} numRounds={numRounds} applyChanges={applyChanges} setError={setError} startAnother={startAnother}/>
         </SubmitContext>
       </main>
     </>

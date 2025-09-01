@@ -1,17 +1,18 @@
-import { useState} from "react";
-import type { langTranslate, GameDisplay } from "../../types/types";
-import { PreparationSection } from "./PreparationSection";
+import { useContext, useState } from "react";
+import type { GameSectionArgs, GameDisplay } from "../../types/types";
+import { SettingSection } from "./PreparationSection";
 import { ProgressSection } from "./ProgressSection";
 import { RoundSection } from "./RoundSection";
-import { useGameStore } from "../../context/context";
+import { SubmitContext, useGameStore } from "../../context/context";
 
 import { useMutation } from "urql";
 import { StartRoundDocument } from "../../graphql/generated";
 
-export function GameSection({ to, from, numRounds, applyChanges, setError }: { to: langTranslate, from: langTranslate, numRounds: number, applyChanges: React.FormEventHandler<HTMLFormElement>, setError: React.Dispatch<React.SetStateAction<string | null>> }) {
+export function GameSection({ to, from, numRounds, applyChanges, setError, startAnother }: GameSectionArgs) {
   const { gameId, reset: resetState, setStatus, status } = useGameStore()
   const [gameStatus, setGameStatus] = useState<keyof GameDisplay>(status)
   const [roundsResult, setRounds] = useMutation(StartRoundDocument)
+  const { isFetching } = useContext(SubmitContext)
 
   if (!gameId) { location.href = "/" };
 
@@ -44,10 +45,10 @@ export function GameSection({ to, from, numRounds, applyChanges, setError }: { t
   const display: GameDisplay = {
     waiting: (
       <>
-        <PreparationSection to={to} from={from} numRounds={numRounds} onSubmit={applyChanges} />
+        <SettingSection to={to} from={from} numRounds={numRounds} onSubmit={applyChanges} />
         <div className="flex flex-row gap-3 *:border-gray-40 *:border-2">
-          <button className="hover:bg-gray-300 p-2.5 rounded-[5px] min-w-15" onClick={startGame}>{roundsResult.fetching ? "Loading..." : "Start"}</button>
-          <button className="hover:bg-gray-300 p-2.5 rounded-[5px] min-w-15" onClick={leaveGame}>Leave</button>
+          <button disabled={isFetching} className="hover:bg-gray-300 p-2.5 rounded-[5px] min-w-15 disabled:pointer-events-none disabled:border-gray-400" onClick={startGame}>{roundsResult.fetching ? "Loading..." : "Start"}</button>
+          <button disabled={isFetching} className="hover:bg-gray-300 p-2.5 rounded-[5px] min-w-15 disabled:pointer-events-none disabled:border-gray-400" onClick={leaveGame}>Leave</button>
         </div>
       </>
     ),
@@ -60,13 +61,13 @@ export function GameSection({ to, from, numRounds, applyChanges, setError }: { t
     finished: (
       <>
         <p>Finished</p>
-        <button className="" onClick={() => { setGameStatus("waiting"); setStatus("waiting") }}>Start Another</button>
+        <button className="" onClick={() => { setGameStatus("waiting"); setStatus("waiting"); startAnother() }}>Start Another</button>
       </>
     )
   }
 
   return (
-    <div className="col-span-4 row-span-2 relative flex flex-col justify-center-safe items-center-safe [&>*]:border-1 gap-20">
+    <div className="col-span-4 row-span-2 relative flex flex-col justify-center-safe items-center-safe [&>>*]:border-1 gap-20">
       {display[gameStatus]}
     </div>
   )
