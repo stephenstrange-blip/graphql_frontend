@@ -87,7 +87,7 @@ export function HorizontalNumberInput({ children, id, increment, decrement, valu
     <div className="flex flex-col gap-5">
       {/* for labels - if any */}
       {children}
-      <div className="flex-row flex">
+      <div className="flex-row flex justify-center-safe">
         <div onClick={decrement} className={`${value <= 1 ? "pointer-events-none": ""}`}> 
           <p  className="p-2.5 pr-5 pl-5 cursor-pointer hover:bg-gray-300 rounded-3xl">-</p>
         </div>

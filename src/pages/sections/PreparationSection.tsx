@@ -116,7 +116,7 @@ export function SettingSection({ to, from, numRounds, onSubmit, maxPlayers }: Se
         </div>
       </span>
       <HorizontalNumberInput id="maxPlayers" value={settings.maxPlayers} increment={INCREMENT.MAX_PLAYERS} decrement={DECREMENT.MAX_PLAYERS}>
-        <label htmlFor="numRounds" className="text-center">Number of Rounds</label>
+        <label htmlFor="maxPlayers" className="text-center">Maximum Players Allowed:</label>
       </HorizontalNumberInput>
 
       <div className="flex flex-row gap-2 justify-center-safe items-center-safe">
