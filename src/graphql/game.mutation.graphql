@@ -31,6 +31,7 @@ mutation updateGame(
   $langTranslateToId: Int = 2
   $numRounds: Int = 1
   $status: Int = 0
+  $maxPlayers: Int = 1
 ) {
   changeGameSetting(
     gameId: $gameId
@@ -38,6 +39,7 @@ mutation updateGame(
     langTranslateToId: $langTranslateToId
     numRounds: $numRounds
     status: $status
+    maxPlayers: $maxPlayers
   ) {
     ... on CustomError {
       message

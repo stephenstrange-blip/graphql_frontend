@@ -15,6 +15,7 @@ query game($gameId: Int = 20) {
         }
         status
         hostId
+        maxPlayers
         participants {
           playerId
           score

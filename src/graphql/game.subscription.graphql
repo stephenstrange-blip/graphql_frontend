@@ -23,6 +23,7 @@ subscription gameUpdated($id: Int = 0) {
     }
     numRounds
     hostId
+    maxPlayers
     participants {
       player {
         name
