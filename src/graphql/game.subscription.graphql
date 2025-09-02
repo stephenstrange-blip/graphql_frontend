@@ -22,6 +22,7 @@ subscription gameUpdated($id: Int = 0) {
       id
     }
     numRounds
+    hostId
     participants {
       player {
         name

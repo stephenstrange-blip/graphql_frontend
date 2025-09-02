@@ -14,8 +14,9 @@ export default function GamePage(args: Route.ComponentProps) {
   const [gameQueryResult] = useQuery({ query: GameDocument, variables: { gameId: Number(gameId) } })
   const [updateGameResult, updateGame] = useMutation(UpdateGameDocument)
   const [error, setError] = useState(gameQueryResult.error?.message ? gameQueryResult.error.message : null)
+  const userId = sessionStorage.getItem("userId")
 
-  let participants: Participants = [], numRounds: number = 0, to: langTranslate = {}, from: langTranslate = {}, data;;
+  let participants: Participants = [], numRounds: number = 0, to: langTranslate = {}, from: langTranslate = {}, hostId: number = 0, data;
 
   if (newGameSettings.data?.gameUpdated) {
     data = newGameSettings.data.gameUpdated
@@ -23,12 +24,14 @@ export default function GamePage(args: Route.ComponentProps) {
     numRounds = data.numRounds as number
     to = data.langTranslateTo as langTranslate
     from = data.langTranslateFrom as langTranslate
+    hostId = data.hostId as number
   } else if (gameQueryResult.data?.game?.__typename === "QueryGameSuccess") {
     data = gameQueryResult.data.game.data;
     participants = data.participants ?? []
     numRounds = data.numRounds as number
     to = data.translateTo as langTranslate
     from = data.translateFrom as langTranslate
+    hostId = data.hostId as number
   }
 
   const { player, opponents } = filterParticipants(participants)
@@ -84,6 +87,8 @@ export default function GamePage(args: Route.ComponentProps) {
     })
   }
 
+
+
   return (
     <>
       <p className={`bg-red-800 text-white w-full text-center p-1.5 ${error ?? 'hidden'}`}>{error}</p>
@@ -91,7 +96,7 @@ export default function GamePage(args: Route.ComponentProps) {
         <PlayerSection player={player} />
         <OpponentSection opponents={opponents} numRounds={numRounds} toCode={to.code ?? ""} fromCode={from.code ?? ""} />
         <SubmitContext value={{ isFetching: updateGameResult.fetching, langTranslateTo: to.code }}>
-          <GameSection to={to} from={from} numRounds={numRounds} applyChanges={applyChanges} setError={setError} startAnother={startAnother}/>
+          <GameSection to={to} from={from} numRounds={numRounds} isHost={hostId === Number(userId)} applyChanges={applyChanges} setError={setError} startAnother={startAnother} />
         </SubmitContext>
       </main>
     </>

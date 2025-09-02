@@ -8,7 +8,7 @@ import { SubmitContext, useGameStore } from "../../context/context";
 import { useMutation } from "urql";
 import { StartRoundDocument } from "../../graphql/generated";
 
-export function GameSection({ to, from, numRounds, applyChanges, setError, startAnother }: GameSectionArgs) {
+export function GameSection({ to, from, numRounds, isHost, applyChanges, setError, startAnother }: GameSectionArgs) {
   const { gameId, reset: resetState, setStatus, status } = useGameStore()
   const [gameStatus, setGameStatus] = useState<keyof GameDisplay>(status)
   const [roundsResult, setRounds] = useMutation(StartRoundDocument)
@@ -47,6 +47,7 @@ export function GameSection({ to, from, numRounds, applyChanges, setError, start
 
   const display: GameDisplay = {
     waiting: (
+      isHost ?
       <>
         <SettingSection to={to} from={from} numRounds={numRounds} onSubmit={applyChanges} />
         <div className="flex flex-row gap-3 *:border-gray-40 *:border-2">
@@ -54,6 +55,7 @@ export function GameSection({ to, from, numRounds, applyChanges, setError, start
           <button disabled={isFetching} className="hover:bg-gray-300 p-2.5 rounded-[5px] min-w-15 disabled:pointer-events-none disabled:border-gray-400" onClick={leaveGame}>Leave</button>
         </div>
       </>
+      : <><p>Waiting</p></>
     ),
     started: (
       <>
