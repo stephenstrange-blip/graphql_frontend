@@ -16,22 +16,26 @@ export default function GamePage(args: Route.ComponentProps) {
   const [error, setError] = useState(gameQueryResult.error?.message ? gameQueryResult.error.message : null)
   const userId = sessionStorage.getItem("userId")
 
-  let participants: Participants = [], numRounds: number = 0, to: langTranslate = {}, from: langTranslate = {}, hostId: number = 0, data;
+  let participants: Participants = [], numRounds: number = 0, to: langTranslate = {}, from: langTranslate = {}, hostId: number = 0, maxPlayers: number = 1, data;
 
   if (newGameSettings.data?.gameUpdated) {
     data = newGameSettings.data.gameUpdated
     participants = data.participants || []
     numRounds = data.numRounds as number
     to = data.langTranslateTo as langTranslate
-    from = data.langTranslateFrom as langTranslate
-    hostId = data.hostId as number
+    from = data.langTranslateFrom as langTranslate,
+    hostId = data.hostId as number,
+    maxPlayers = data.maxPlayers as number
+    console.log(data.maxPlayers + " in subscription")
   } else if (gameQueryResult.data?.game?.__typename === "QueryGameSuccess") {
     data = gameQueryResult.data.game.data;
     participants = data.participants ?? []
     numRounds = data.numRounds as number
     to = data.translateTo as langTranslate
     from = data.translateFrom as langTranslate
-    hostId = data.hostId as number
+    hostId = data.hostId as number,
+    maxPlayers = data.maxPlayers as number
+    console.log(data.maxPlayers + " in query")
   }
 
   const { player, opponents } = filterParticipants(participants)
@@ -42,12 +46,12 @@ export default function GamePage(args: Route.ComponentProps) {
     setError(null)
 
     const formData = new FormData(e.currentTarget);
-    const { numRounds: _numRounds, from: _from, to: _to } = parseFormData<updateGameSettings>(formData, { numRounds: "number", from: "number", to: "number" })
+    const { numRounds: _numRounds, from: _from, to: _to, maxPlayers: _maxPlayers } = parseFormData<updateGameSettings>(formData, { numRounds: "number", from: "number", to: "number", maxPlayers: "number" })
 
     if (_from === _to)
       return setError("Cannot translate from the same language!")
 
-    if (numRounds === _numRounds && Number(from.id) === _from && Number(to.id) === _to)
+    if (numRounds === _numRounds && Number(from.id) === _from && Number(to.id) === _to && maxPlayers === _maxPlayers)
       return setError("No changes detected!")
 
     const payload = {
@@ -55,6 +59,7 @@ export default function GamePage(args: Route.ComponentProps) {
       numRounds: _numRounds,
       langTranslateFromId: _from,
       langTranslateToId: _to,
+      maxPlayers: _maxPlayers
     }
 
     // Triggers the subscription event in the backend
@@ -96,7 +101,7 @@ export default function GamePage(args: Route.ComponentProps) {
         <PlayerSection player={player} />
         <OpponentSection opponents={opponents} numRounds={numRounds} toCode={to.code ?? ""} fromCode={from.code ?? ""} />
         <SubmitContext value={{ isFetching: updateGameResult.fetching, langTranslateTo: to.code }}>
-          <GameSection to={to} from={from} numRounds={numRounds} isHost={hostId === Number(userId)} applyChanges={applyChanges} setError={setError} startAnother={startAnother} />
+          <GameSection to={to} from={from} numRounds={numRounds} isHost={hostId === Number(userId)} applyChanges={applyChanges} setError={setError} startAnother={startAnother} maxPlayers={maxPlayers} />
         </SubmitContext>
       </main>
     </>
