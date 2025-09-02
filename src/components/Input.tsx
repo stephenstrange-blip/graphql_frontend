@@ -81,21 +81,7 @@ export function PlayerInput({ isRoundActive, roundId, isCorrect, setIsCorrect }:
   )
 }
 
-export function HorizontalNumberInput({ children, id, onChange, value }: HorizontalNumberInputArgs) {
-
-  const increment = () => {
-    onChange(settings => {
-      const { numRounds, ...others } = settings;
-      return { numRounds: numRounds < 10 ? numRounds + 1 : numRounds, ...others }
-    })
-  }
-
-  const decrement = () => {
-    onChange(settings => {
-      const { numRounds, ...others } = settings;
-      return { numRounds: numRounds > 1 ? numRounds - 1: numRounds, ...others }
-    })
-  }
+export function HorizontalNumberInput({ children, id, increment, decrement, value }: HorizontalNumberInputArgs) {
 
   return (
     <div className="flex flex-col gap-5">
