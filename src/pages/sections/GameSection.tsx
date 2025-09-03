@@ -10,12 +10,11 @@ import { StartRoundDocument } from "../../graphql/generated";
 
 export function GameSection({ maxPlayers, to, from, numRounds, isHost, applyChanges, setError, startAnother }: GameSectionArgs) {
   const { gameId, reset: resetState, setStatus, status } = useGameStore()
-  const [gameStatus, setGameStatus] = useState<keyof GameDisplay>(status)
   const [roundsResult, setRounds] = useMutation(StartRoundDocument)
   const { isFetching } = useContext(SubmitContext)
 
-  if (!gameId) { 
-    location.href = "/" 
+  if (!gameId) {
+    location.href = "/"
     return <></>
   };
 
@@ -29,7 +28,6 @@ export function GameSection({ maxPlayers, to, from, numRounds, isHost, applyChan
 
       if (result.data?.startRound?.__typename === "MutationStartRoundSuccess") {
         // used by and to exit from RoundSection
-        setGameStatus("started");
         // storing game status to display appropriate components
         // incase of reconnecting clients mid-game
         setStatus("started")
@@ -48,32 +46,32 @@ export function GameSection({ maxPlayers, to, from, numRounds, isHost, applyChan
   const display: GameDisplay = {
     waiting: (
       isHost ?
-      <>
-        <SettingSection to={to} from={from} numRounds={numRounds} onSubmit={applyChanges} maxPlayers={maxPlayers}/>
-        <div className="flex flex-row gap-3 *:border-gray-40 *:border-2">
-          <button disabled={isFetching} className="hover:bg-gray-300 p-2.5 rounded-[5px] min-w-15 disabled:pointer-events-none disabled:border-gray-400" onClick={startGame}>{roundsResult.fetching ? "Loading..." : "Start"}</button>
-          <button disabled={isFetching} className="hover:bg-gray-300 p-2.5 rounded-[5px] min-w-15 disabled:pointer-events-none disabled:border-gray-400" onClick={leaveGame}>Leave</button>
-        </div>
-      </>
-      : <><p>Waiting</p></>
+        <>
+          <SettingSection to={to} from={from} numRounds={numRounds} onSubmit={applyChanges} maxPlayers={maxPlayers} />
+          <div className="flex flex-row gap-3 *:border-gray-40 *:border-2">
+            <button disabled={isFetching} className="hover:bg-gray-300 p-2.5 rounded-[5px] min-w-15 disabled:pointer-events-none disabled:border-gray-400" onClick={startGame}>{roundsResult.fetching ? "Loading..." : "Start"}</button>
+            <button disabled={isFetching} className="hover:bg-gray-300 p-2.5 rounded-[5px] min-w-15 disabled:pointer-events-none disabled:border-gray-400" onClick={leaveGame}>Leave</button>
+          </div>
+        </>
+        : <><p>Waiting</p></>
     ),
     started: (
       <>
-        <RoundSection gameId={gameId} exitRound={setGameStatus} />
+        <RoundSection gameId={gameId} />
         <ProgressSection />
       </>
     ),
     finished: (
       <>
         <p>Finished</p>
-        <button className="" onClick={() => { setGameStatus("waiting"); setStatus("waiting"); startAnother() }}>Start Another</button>
+        <button className="" onClick={() => { setStatus("waiting"); startAnother() }}>Start Another</button>
       </>
     )
   }
 
   return (
     <div className="col-span-4 row-span-2 relative flex flex-col justify-center-safe items-center-safe [&>>*]:border-1 gap-20">
-      {display[gameStatus]}
+      {display[status]}
     </div>
   )
 }

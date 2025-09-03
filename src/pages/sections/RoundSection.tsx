@@ -9,7 +9,7 @@ import Countdown from "../../components/Countdown";
 import Timer from "../../components/Timer";
 import Answer from "../../components/Answer";
 
-export function RoundSection({ gameId, exitRound }: { gameId: number, exitRound: React.Dispatch<React.SetStateAction<keyof GameDisplay>> }) {
+export function RoundSection({ gameId }: { gameId: number }) {
   const [isCorrect, setIsCorrect] = useState(false)
   const [preCd] = useSubscription({ query: PreCountDownDocument, variables: { gameId } });
   const [postCd] = useSubscription({ query: PostCountDownDocument, variables: { gameId } });
@@ -84,7 +84,6 @@ export function RoundSection({ gameId, exitRound }: { gameId: number, exitRound:
         // store game status to display appropriate components
         // incase of reconnecting clients post-game
         setStatus("finished");
-        exitRound("finished");
 
       }, 3000)
 
