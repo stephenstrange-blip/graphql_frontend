@@ -23,19 +23,17 @@ export default function GamePage(args: Route.ComponentProps) {
     participants = data.participants || []
     numRounds = data.numRounds as number
     to = data.langTranslateTo as langTranslate
-    from = data.langTranslateFrom as langTranslate,
-    hostId = data.hostId as number,
+    from = data.langTranslateFrom as langTranslate
+    hostId = data.hostId as number
     maxPlayers = data.maxPlayers as number
-    console.log(data.maxPlayers + " in subscription")
   } else if (gameQueryResult.data?.game?.__typename === "QueryGameSuccess") {
     data = gameQueryResult.data.game.data;
     participants = data.participants ?? []
     numRounds = data.numRounds as number
     to = data.translateTo as langTranslate
     from = data.translateFrom as langTranslate
-    hostId = data.hostId as number,
+    hostId = data.hostId as number
     maxPlayers = data.maxPlayers as number
-    console.log(data.maxPlayers + " in query")
   }
 
   const { player, opponents } = filterParticipants(participants)
@@ -82,6 +80,7 @@ export default function GamePage(args: Route.ComponentProps) {
       numRounds: numRounds,
       langTranslateFromId: Number(from.id),
       langTranslateToId: Number(to.id),
+      maxPlayers: 6,
     }
 
     updateGame(payload).then(result => {
