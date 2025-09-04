@@ -5,13 +5,23 @@ import { ProgressSection } from "./ProgressSection";
 import { RoundSection } from "./RoundSection";
 import { SubmitContext, useGameStore } from "../../context/context";
 
-import { useMutation } from "urql";
-import { StartRoundDocument } from "../../graphql/generated";
+import { useMutation, useSubscription } from "urql";
+import { GameStartedDocument, StartRoundDocument, type GameStartedSubscription } from "../../graphql/generated";
 
 export function GameSection({ maxPlayers, to, from, numRounds, isHost, applyChanges, setError, startAnother }: GameSectionArgs) {
   const { gameId, reset: resetState, setStatus, status } = useGameStore()
+  const [start] = useSubscription({ query: GameStartedDocument, variables: { gameId, userId: Number(sessionStorage.getItem("userId")) } }, handleStart)
   const [roundsResult, setRounds] = useMutation(StartRoundDocument)
   const { isFetching } = useContext(SubmitContext)
+
+  function handleStart(_: GameStartedSubscription | undefined | null, current: GameStartedSubscription) {
+    // change display for non-host participants
+    if (!isHost && current && current.gameStarted?.__typename === "SubscriptionGameStartedSuccess" && current.gameStarted.data)
+      setStatus("started")
+    else if (!isHost && current && current.gameStarted?.__typename === "SubscriptionGameStartedSuccess" && !(current.gameStarted.data) )
+      setStatus("waiting")
+    return current
+  }
 
   if (!gameId) {
     location.href = "/"
@@ -64,7 +74,7 @@ export function GameSection({ maxPlayers, to, from, numRounds, isHost, applyChan
     finished: (
       <>
         <p>Finished</p>
-        <button className="" onClick={() => { setStatus("waiting"); startAnother() }}>Start Another</button>
+        {isHost && <button className="" onClick={() => { setStatus("waiting"); startAnother() }}>Start Another</button>}
       </>
     )
   }

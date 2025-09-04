@@ -2,11 +2,13 @@ mutation startRound(
   $gameId: Int = 0
   $langTranslateFrom: String = ""
   $langTranslateTo: String = ""
+  $hostId: Int = 0
 ) {
   startRound(
     gameId: $gameId
     langTranslateFrom: $langTranslateFrom
     langTranslateTo: $langTranslateTo
+    hostId: $hostId
   ) {
     ... on MutationStartRoundSuccess {
       __typename

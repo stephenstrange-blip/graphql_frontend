@@ -11,7 +11,7 @@ subscription playerJoined {
 }
 
 subscription gameUpdated($id: Int = 0) {
-  gameUpdated(id: $id ){
+  gameUpdated(id: $id) {
     id
     langTranslateFrom {
       code
@@ -30,6 +30,19 @@ subscription gameUpdated($id: Int = 0) {
       }
       score
       playerId
+    }
+  }
+}
+
+subscription gameStarted($gameId: Int = 0, $userId: Int = 0) {
+  gameStarted(gameId: $gameId, userId: $userId) {
+    ... on CustomError {
+      message
+      status
+    }
+    ... on SubscriptionGameStartedSuccess {
+      __typename
+      data
     }
   }
 }
