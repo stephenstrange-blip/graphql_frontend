@@ -5,23 +5,18 @@ import { ProgressSection } from "./ProgressSection";
 import { RoundSection } from "./RoundSection";
 import { SubmitContext, useGameStore } from "../../context/context";
 
-import { useMutation, useSubscription } from "urql";
-import { GameStartedDocument, StartRoundDocument, type GameStartedSubscription } from "../../graphql/generated";
+import { useMutation } from "urql";
+import { StartRoundDocument } from "../../graphql/generated";
 
 export function GameSection({ maxPlayers, to, from, numRounds, isHost, applyChanges, setError, startAnother }: GameSectionArgs) {
-  const { gameId, reset: resetState, setStatus, status } = useGameStore()
-  const [start] = useSubscription({ query: GameStartedDocument, variables: { gameId, userId: Number(sessionStorage.getItem("userId")) } }, handleStart)
+  const setStatus = useGameStore(state => state.setStatus);
+  const resetState = useGameStore(state => state.reset);
+  const gameId = useGameStore(state => state.gameId)
+  const status = useGameStore(state => state.status)
+  const userId = sessionStorage.getItem("userId")
+
   const [roundsResult, setRounds] = useMutation(StartRoundDocument)
   const { isFetching } = useContext(SubmitContext)
-
-  function handleStart(_: GameStartedSubscription | undefined | null, current: GameStartedSubscription) {
-    // change display for non-host participants
-    if (!isHost && current && current.gameStarted?.__typename === "SubscriptionGameStartedSuccess" && current.gameStarted.data)
-      setStatus("started")
-    else if (!isHost && current && current.gameStarted?.__typename === "SubscriptionGameStartedSuccess" && !(current.gameStarted.data) )
-      setStatus("waiting")
-    return current
-  }
 
   if (!gameId) {
     location.href = "/"
@@ -29,7 +24,7 @@ export function GameSection({ maxPlayers, to, from, numRounds, isHost, applyChan
   };
 
   const startGame = () => {
-    setRounds({ gameId, langTranslateTo: to.code, langTranslateFrom: from.code }).then(result => {
+    setRounds({ gameId, langTranslateTo: to.code, langTranslateFrom: from.code, hostId: Number(userId) }).then(result => {
 
       if (result.error)
         return setError("Error: " + result.error)
@@ -41,17 +36,17 @@ export function GameSection({ maxPlayers, to, from, numRounds, isHost, applyChan
         // storing game status to display appropriate components
         // incase of reconnecting clients mid-game
         setStatus("started")
-
       }
     })
 
   }
 
+  // TODO: WRAP THE BUTTON INSTEAD IN A REACT_ROUTER LINK
+  // I SUSPECT WE RE-SUBSCRIBE WHENEVER WE RELOAD PAGE
   const leaveGame = () => {
     resetState();
     location.href = "/";
   }
-
 
   const display: GameDisplay = {
     waiting: (
