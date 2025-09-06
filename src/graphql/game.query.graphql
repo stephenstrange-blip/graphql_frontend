@@ -32,7 +32,6 @@ query game($gameId: Int = 20) {
   }
 }
 
-
 query games {
   games {
     ... on CustomError {
@@ -55,6 +54,24 @@ query games {
           id
         }
         winnerId
+      }
+    }
+  }
+}
+
+query points($gameId: Int = 0) {
+  points(gameId: $gameId) {
+    ... on CustomError {
+      message
+      status
+    }
+    ... on QueryPointsSuccess {
+      __typename
+      data {
+        answers {
+          points
+        }
+        playerId
       }
     }
   }

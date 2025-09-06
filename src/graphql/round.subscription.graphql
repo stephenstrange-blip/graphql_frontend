@@ -71,3 +71,10 @@ subscription round($gameId: Int = 0) {
     }
   }
 }
+
+subscription pointUpdated($gameId: Int = 0) {
+  point(gameId: $gameId) {
+    points
+    userId
+  }
+}
