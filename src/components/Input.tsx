@@ -34,9 +34,9 @@ export function PlayerInput({ isRoundActive, roundId, isCorrect, setIsCorrect }:
 
     const payload: SubmitAnswerMutationVariables = {
       answer: answer,
-      playerId: Number(localStorage.getItem("userId")) ?? 0,
-      gameId: gameId ?? 0,
-      langTranslateTo: langTranslateTo ?? "eng",
+      playerId: Number(sessionStorage.getItem("userId")),
+      gameId: gameId,
+      langTranslateTo: langTranslateTo,
       roundId,
     }
 
