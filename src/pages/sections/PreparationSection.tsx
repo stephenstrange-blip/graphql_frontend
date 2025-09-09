@@ -3,7 +3,7 @@ import { Form } from "react-router";
 import { SubmitContext } from "../../context/context";
 import { HorizontalNumberInput } from "../../components/Input";
 import { Dropdown } from "../../components/Dropdown";
-import type { SettingSectionArgs } from "../../types/types";
+import { GAME_SETTINGS, type SettingSectionArgs } from "../../types/types";
 
 
 export function SettingSection({ to, from, numRounds, onSubmit, maxPlayers }: SettingSectionArgs) {
@@ -49,15 +49,6 @@ export function SettingSection({ to, from, numRounds, onSubmit, maxPlayers }: Se
     setSettings({ to: to.id, from: from.id, numRounds, maxPlayers })
     // prevent form submission
     return
-  }
-
-  const GAME_SETTINGS = {
-    // This is set for all GAMES
-    // meaning hosts cannot extend up/down to the limit below
-    MAX_PLAYERS: 6,
-    MIN_PLAYERS: 1,
-    MAX_ROUNDS: 10,
-    MIN_ROUNDS: 1,
   }
 
   const INCREMENT = {
