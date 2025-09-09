@@ -63,7 +63,7 @@ export function GameSection({ maxPlayers, to, from, numRounds, isHost, applyChan
     started: (
       <>
         <RoundSection gameId={gameId} />
-        <ProgressSection />
+        <ProgressSection numRounds={numRounds} />
       </>
     ),
     finished: (
