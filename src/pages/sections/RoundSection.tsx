@@ -1,10 +1,10 @@
 import { CombinedError, useSubscription } from "urql";
 import { PlayerInput } from "../../components/Input"
-import { PreCountDownDocument, PostCountDownDocument, RoundDocument, TimerDocument, type RoundPayload, PhaseDocument, type CustomError, type PhaseSubscription } from "../../graphql/generated";
-import type { GameDisplay, RoundPhase } from "../../types/types";
+import { PreCountDownDocument, PostCountDownDocument, RoundDocument, TimerDocument, type RoundPayload, PhaseDocument, type CustomError } from "../../graphql/generated";
+import type { RoundPhase } from "../../types/types";
 import { sleep } from "../../utils/utils";
 import { useGameStore } from "../../context/context";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Countdown from "../../components/Countdown";
 import Timer from "../../components/Timer";
 import Answer from "../../components/Answer";
@@ -15,15 +15,13 @@ export function RoundSection({ gameId }: { gameId: number }) {
   const [postCd] = useSubscription({ query: PostCountDownDocument, variables: { gameId } });
   const [t] = useSubscription({ query: TimerDocument, variables: { gameId } });
   const [r] = useSubscription({ query: RoundDocument, variables: { gameId } })
-  const [p] = useSubscription({ query: PhaseDocument, variables: { gameId } }, handlePhase)
+  const [p] = useSubscription({ query: PhaseDocument, variables: { gameId }})
 
   // setting isCorrect to false every change of phase
   // disables user input found inside the PlayerInput component
-  function handlePhase(previous: PhaseSubscription | undefined, current: PhaseSubscription): PhaseSubscription {
-    if (previous && (previous !== current))
-      setIsCorrect(false)
-    return current
-  }
+  useEffect(() => {
+    setIsCorrect(false)
+  }, [p.data])
 
   const setStatus = useGameStore(state => state.setStatus)
 
