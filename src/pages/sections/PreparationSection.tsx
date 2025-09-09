@@ -3,7 +3,7 @@ import { Form } from "react-router";
 import { SubmitContext } from "../../context/context";
 import { HorizontalNumberInput } from "../../components/Input";
 import { Dropdown } from "../../components/Dropdown";
-import { GAME_SETTINGS, type SettingSectionArgs } from "../../types/types";
+import { GAME_SETTINGS, languageWithNames, type SettingSectionArgs } from "../../types/types";
 
 
 export function SettingSection({ to, from, numRounds, onSubmit, maxPlayers }: SettingSectionArgs) {
@@ -22,25 +22,6 @@ export function SettingSection({ to, from, numRounds, onSubmit, maxPlayers }: Se
     })
   }, [numRounds, from.id, to.id, maxPlayers])
 
-  const langugageNames = {
-    eng: "english",
-    ger: "german",
-    fil: "filipino",
-    kor: "korean"
-  }
-
-  const languages = [
-    { code: "eng", id: 0 },
-    { code: "fil", id: 2 },
-    { code: "ger", id: 1 },
-    { code: "kor", id: 3 }
-  ]
-
-  const languageWithNames = languages.map(item => ({
-    code: item.code,
-    id: item.id,
-    name: langugageNames[item.code as keyof typeof langugageNames]
-  }))
 
   // In case of failed gamesetting update, 
   // or client wants to reset the game settings

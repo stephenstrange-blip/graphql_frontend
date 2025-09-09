@@ -1,6 +1,6 @@
 import { useContext, useRef, useState} from "react"
 import { Form } from "react-router"
-import type { HorizontalNumberInputArgs, PlayerInputArgs } from "../types/types"
+import { GAME_SETTINGS, type HorizontalNumberInputArgs, type PlayerInputArgs } from "../types/types"
 import { sleep } from "../utils/utils"
 import { SubmitAnswerDocument, type SubmitAnswerMutationVariables } from "../graphql/generated"
 import { SubmitContext, useGameStore } from "../context/context"
@@ -82,7 +82,7 @@ export function PlayerInput({ isRoundActive, roundId, isCorrect, setIsCorrect }:
 }
 
 export function HorizontalNumberInput({ children, id, increment, decrement, value }: HorizontalNumberInputArgs) {
-
+  const maxValue = id === "numRounds" ? GAME_SETTINGS.MAX_ROUNDS : GAME_SETTINGS.MAX_PLAYERS
   return (
     <div className="flex flex-col gap-5">
       {/* for labels - if any */}
@@ -92,7 +92,7 @@ export function HorizontalNumberInput({ children, id, increment, decrement, valu
           <p  className="p-2.5 pr-5 pl-5 cursor-pointer hover:bg-gray-300 rounded-3xl">-</p>
         </div>
         <input className="text-center focus:border-0 max-w-fit w-20 pl-0.5 pointer-events-none" type="text" inputMode="numeric" pattern="[0-9]*" id={id} name={id} value={value} key={value} readOnly={true} />
-        <div onClick={increment} className={`${value >= 10 ? "pointer-events-none": ""}`}>
+        <div onClick={increment} className={`${value >= maxValue ? "pointer-events-none": ""}`}>
           <p className="p-2.5 pr-5 pl-5 cursor-pointer hover:bg-gray-300 rounded-3xl">+</p>
         </div>
       </div>
