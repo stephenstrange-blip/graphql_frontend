@@ -68,3 +68,16 @@ mutation joinGame($gameId: Int = 1, $userId: Int = 1) {
     }
   }
 }
+
+mutation exitGame($gameId: Int = 0, $hostId: Int = 0) {
+  exitGame(gameId: $gameId, hostId: $hostId) {
+    ... on CustomError {
+      message
+      status
+    }
+    ... on MutationExitGameSuccess {
+      __typename
+      data
+    }
+  }
+}

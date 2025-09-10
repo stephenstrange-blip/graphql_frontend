@@ -2,8 +2,8 @@ import type { Route } from "./+types/Game"
 import { useEffect, useState } from "react"
 import { SubmitContext, useGameStore } from "../context/context"
 import { useMutation, useQuery, useSubscription } from "urql"
-import { GameDocument, GameStartedDocument, GameUpdatedDocument, UpdateGameDocument, type GameSession, type GameStartedSubscription, type GameUpdated, type GameUpdatedSubscription } from "../graphql/generated"
-import type { GamePageData, updateGameSettings } from "../types/types"
+import { GameDocument, GameStatusDocument, GameUpdatedDocument, UpdateGameDocument } from "../graphql/generated"
+import type { GameDisplay, GamePageData, updateGameSettings } from "../types/types"
 import { filterParticipants, parseFormData } from "../utils/utils"
 import { GameSection } from "./sections/GameSection"
 import { PlayerSection, OpponentSection } from "./sections/ParticipantSection"
@@ -11,6 +11,7 @@ import { PlayerSection, OpponentSection } from "./sections/ParticipantSection"
 export default function GamePage(args: Route.ComponentProps) {
   const gameId = useGameStore(state => state.gameId);
   const setStatus = useGameStore(state => state.setStatus)
+  const resetStatus = useGameStore(state => state.reset)
   const [newGameSettings] = useSubscription({ query: GameUpdatedDocument, variables: { id: gameId } })
   const [gameQueryResult] = useQuery({ query: GameDocument, variables: { gameId: Number(gameId) } })
   const [updateGameResult, updateGame] = useMutation(UpdateGameDocument)
@@ -33,19 +34,25 @@ export default function GamePage(args: Route.ComponentProps) {
 
   const userId = sessionStorage.getItem("userId")
   const isHost = data.hostId === Number(userId)
-  const [gameStarted] = useSubscription({ query: GameStartedDocument, variables: { gameId, userId: Number(sessionStorage.getItem("userId")) } })
+  const [gameStatus] = useSubscription({ query: GameStatusDocument, variables: { gameId, userId: Number(sessionStorage.getItem("userId")) } })
 
   useEffect(() => {
-    const payload = gameStarted.data
+    const payload = gameStatus.data
 
     // update non-host participants to game status changes
-    if (!isHost && payload && payload.gameStarted?.__typename === "SubscriptionGameStartedSuccess" && payload.gameStarted.data)
-      setStatus("started")
+    // hosts will reset status at GameSection
+    if (!isHost && payload && payload.gameStatusUpdated?.__typename === "SubscriptionGameStatusUpdatedSuccess") {
+      const status = payload.gameStatusUpdated.data
 
-    else if (!isHost && payload && payload.gameStarted?.__typename === "SubscriptionGameStartedSuccess" && !(payload.gameStarted.data))
-      setStatus("waiting")
-
-  }, [isHost, gameStarted.data])
+      // reset game status if told to exit from game 
+      if (status === "exit")
+        resetStatus()
+      // otherwise, update game status
+      else 
+        setStatus(status as keyof GameDisplay)
+    }
+    
+  }, [isHost, gameStatus.data])
 
 
   // This handler is for when user changes game settings prior to game
@@ -110,7 +117,7 @@ export default function GamePage(args: Route.ComponentProps) {
       <main className="size-full grid grid-rows-2 grid-cols-5 [&>*]:border-1 p-[1rem] gap-4">
         <PlayerSection player={player} />
         <OpponentSection opponents={opponents} numRounds={data.numRounds!} toCode={to?.code ?? ""} fromCode={from?.code ?? ""} />
-        <SubmitContext value={{ isFetching: updateGameResult.fetching, langTranslateTo: to?.code }}>
+        <SubmitContext value={{ isUpdating: updateGameResult.fetching, langTranslateTo: to?.code }}>
           <GameSection
             to={to ?? {}}
             from={from ?? {}}

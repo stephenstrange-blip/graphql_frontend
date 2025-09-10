@@ -34,13 +34,13 @@ subscription gameUpdated($id: Int = 0) {
   }
 }
 
-subscription gameStarted($gameId: Int = 0, $userId: Int = 0) {
-  gameStarted(gameId: $gameId, userId: $userId) {
+subscription gameStatus($gameId: Int = 0, $userId: Int = 0) {
+  gameStatusUpdated(gameId: $gameId, userId: $userId) {
     ... on CustomError {
       message
       status
     }
-    ... on SubscriptionGameStartedSuccess {
+    ... on SubscriptionGameStatusUpdatedSuccess {
       __typename
       data
     }
