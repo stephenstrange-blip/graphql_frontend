@@ -22,4 +22,4 @@ export const useGameStore = create<State & Action>()(
   ),
 )
 
-export const SubmitContext = createContext({ isFetching: false, langTranslateTo: null as langTranslate["code"] });
+export const SubmitContext = createContext({ isUpdating: false, langTranslateTo: null as langTranslate["code"] });

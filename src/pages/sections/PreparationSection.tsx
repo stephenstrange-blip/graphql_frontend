@@ -7,7 +7,7 @@ import { GAME_SETTINGS, languageWithNames, type SettingSectionArgs } from "../..
 
 
 export function SettingSection({ to, from, numRounds, onSubmit, maxPlayers }: SettingSectionArgs) {
-  const { isFetching } = useContext(SubmitContext)
+  const { isUpdating: isFetching } = useContext(SubmitContext)
   const [settings, setSettings] = useState({ to: to.id, from: from.id, numRounds, maxPlayers: maxPlayers })
   
   // After render, data may not be available immediately 
