@@ -1,4 +1,4 @@
-import { useContext, useRef, useState } from "react"
+import { useContext, useEffect, useRef, useState } from "react"
 import { Form } from "react-router"
 import { GAME_SETTINGS, type HorizontalNumberInputArgs, type PlayerInputArgs } from "../types/types"
 import { sleep } from "../utils/utils"
@@ -6,7 +6,7 @@ import { SubmitAnswerDocument, type SubmitAnswerMutationVariables } from "../gra
 import { SubmitContext, useGameStore } from "../context/context"
 import { useMutation } from "urql"
 
-export function PlayerInput({ isRoundActive, roundId, isCorrect, setIsCorrect }: PlayerInputArgs) {
+export function PlayerInput({ timer, isRoundActive, roundId, isCorrect, setIsCorrect }: PlayerInputArgs) {
   const [submitAnswerResult, submitAnswer] = useMutation(SubmitAnswerDocument)
   const [inputError, setInputError] = useState<string | null>(null)
   const [answer, setAnswer] = useState('')
@@ -14,13 +14,21 @@ export function PlayerInput({ isRoundActive, roundId, isCorrect, setIsCorrect }:
   const gameId = useGameStore(state => state.gameId)
   const { langTranslateTo } = useContext(SubmitContext)
 
+  const noTimeLeft = (GAME_SETTINGS.MAX_TIMER_ - timer) === 0
   const inRound = isRoundActive === "inRound"
   const putHighlight = inRound && isCorrect
-  const disable = !inRound || isCorrect || submitAnswerResult.fetching
+  const disable = !inRound || isCorrect || submitAnswerResult.fetching || noTimeLeft
+
+  useEffect(() => {
+    if (!inRound)
+      setAnswer("")
+
+  }, [inRound])
 
   const handleSubmit: React.FormEventHandler<HTMLFormElement> = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setInputError(null)
+
     const formData = new FormData(e.currentTarget);
     const answer = formData.get("answer") as string
 
@@ -58,18 +66,24 @@ export function PlayerInput({ isRoundActive, roundId, isCorrect, setIsCorrect }:
     return
   }
 
+  const inputClass = {
+    highlighted: "text-center text-white disabled:border-b-5 min-w-input-constraint md:text-[48px] xs:text-[24px] border-b-[2px] outline-0 border-green-600 focus:border-[5px]",
+    non_highlighted: "text-center text-white disabled:border-b-5 min-w-input-constraint md:text-[48px] xs:text-[24px] border-b-[5px] outline-0"
+  }
+
   return (
     <div>
-      <Form className="text-center relative flex flex-col justify-center-safe items-center-safe" onSubmit={handleSubmit} >
+      <Form className="text-center relative flex flex-col justify-center-safe items-center-safe text-white" onSubmit={handleSubmit} >
         <label htmlFor="answer"></label>
         <p className="absolute top-0 right-0 bg-amber-700 text-amber-100 text-[15px]">{inputError}</p>
         <input ref={inputRef}
-          className={" disabled:border-b-1 min-w-input-constraint md:text-[48px] xs:text-[24px] focus:border-b-gray-200 border-b-2 outline-0 " + (putHighlight ? "border-green-600 focus:border-green-600" : "")}
+          className={putHighlight ? inputClass.highlighted : inputClass.non_highlighted}
           disabled={disable}
           type="text"
           id="answer"
           name="answer"
           value={inRound ? answer : ''}
+          autoFocus={disable}
           onChange={e => {
             setInputError(null)
             setAnswer(e.currentTarget.value)

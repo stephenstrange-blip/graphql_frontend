@@ -105,7 +105,7 @@ export function RoundSection({ gameId }: { gameId: number }) {
           <p className="from md:text-[48px] xs:text-[22px] text-center">{roundState.round.wordTranslateFrom ?? ""}</p>
         </span>
       </span>
-      <PlayerInput isRoundActive={roundState.phase} roundId={roundState.round.id} isCorrect={isCorrect} setIsCorrect={setIsCorrect} />
+      <PlayerInput timer={roundState.timer} isRoundActive={roundState.phase} roundId={roundState.round.id} isCorrect={isCorrect} setIsCorrect={setIsCorrect} />
     </div>
   )
 }
