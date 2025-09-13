@@ -65,8 +65,8 @@ export function ProgressSection({ numRounds }: { numRounds: number }) {
   return (
     <>
       <span className={`${error.length === 0 && 'hidden'}`}>{error.map(err => <p>{err}</p>)}</span>
-      <div className="flex flex-col justify-center-safe items-center-safe absolute top-0 right-0 min-w-[270px] min-h-[80px] p-4.5">
-        {updatedPoint.data?.point?.userId === Number(userId) && <span ref={pointRef} className="fleeting-point absolute top-10 right-70 text-[30px]">+{updatedPoint.data?.point.points}</span>}
+      {updatedPoint.data?.point?.userId === Number(userId) && <span ref={pointRef} className="fleeting-point absolute xs:top-10 xs:right-30 lg:top-10 lg:right-70 text-[30px]">+{updatedPoint.data?.point.points}</span>}
+      <div className=" scroll-smooth overflow-x-scroll flex flex-col justify-center-safe items-center-safe absolute top-0 right-0 xs:max-sm:min-w-[135px] md:min-w-[270px] xs:max-h-[50px] lg:max-h-[140px] md:p-4.5 xs:pt-1 xs:pr-1.5">
         {
           scoreBoard.map(item => (
             <ProgressDisplay key={item.userId} points={item.points} numRounds={numRounds} />
@@ -82,16 +82,16 @@ export function ProgressDisplay({ points, numRounds }: { points: number, numRoun
   const percentage = Math.ceil((points / maxPointsPerGame) * 100)
 
   const SCORE = {
-    PERFECT: "text-2xl h-[50%] bg-blue-400",
-    HIGH: "text-2xl h-[50%] bg-blue-600",
-    AVERAGE: "text-2xl h-[50%] bg-blue-700",
-    LOW: "text-2xl h-[50%] bg-blue-950"
+    PERFECT: "text-2xl md:h-[50%] xs:h-[40%] bg-blue-400",
+    HIGH: "text-2xl md:h-[50%] xs:h-[40%] bg-blue-600",
+    AVERAGE: "text-2xl md:h-[50%] xs:h-[40%] bg-blue-700",
+    LOW: "text-2xl md:h-[50%] xs:h-[40%] bg-blue-950"
   }
 
   const divClass = percentage === 100 ? SCORE.PERFECT : (percentage >= 80 ? SCORE.HIGH : (percentage >= 50 ? SCORE.AVERAGE : SCORE.LOW))
   return (
-    <div className="flex flex-row w-full h-[26px] items relative">
-      <p className="h-full w-[10%] me-1.5">
+    <div className="flex flex-row w-full md:h-[26px] xs:h-[16px] relative">
+      <p className="h-full md:shrink-0 md:w-[10%] me-1.5">
         <img className="size-full" src={githubIcon} alt="#" />
       </p>
       <div className="h-full w-[90%] flex flex-row items-center-safe">

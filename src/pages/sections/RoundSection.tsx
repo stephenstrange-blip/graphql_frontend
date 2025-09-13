@@ -98,11 +98,11 @@ export function RoundSection({ gameId }: { gameId: number }) {
     <div className="flex flex-col justify-baseline w-full h-[80%] gap-3">
       <Timer timer={roundState.timer} />
       <Countdown countDown={{ post: roundState.postCountDown, pre: roundState.preCountDown }} phase={roundState.phase} />
-      <span className="flex flex-col border-1 items-center-safe h-[50%] justify-around">
+      <span className="flex flex-col items-center-safe h-[50%] justify-around">
         <Answer wordTranslateTo={roundState.round.wordTranslateTo} />
         <span>
           <p className="roundNumber text-center">Round: {roundState.round.roundNumber ?? ''}</p>
-          <p className="from text-[48px]">{roundState.round.wordTranslateFrom ?? ""}</p>
+          <p className="from md:text-[48px] xs:text-[22px] text-center">{roundState.round.wordTranslateFrom ?? ""}</p>
         </span>
       </span>
       <PlayerInput isRoundActive={roundState.phase} roundId={roundState.round.id} isCorrect={isCorrect} setIsCorrect={setIsCorrect} />

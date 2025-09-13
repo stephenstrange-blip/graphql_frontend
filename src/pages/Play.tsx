@@ -5,9 +5,8 @@ import githubIcon from "../assets/github-original.svg"
 import linkedInIcon from "../assets/linkedin-plain.svg"
 
 export default function PlayPage(args: Route.ComponentProps) {
-  console.log("I am PlayPage and here is my args ", args)
   return (
-    <div className="flex-col h-screen w-full flex items-center">
+    <div className="bg-dark flex-col lg:max-xl:h-full xs:h-screen w-full flex items-center">
       <Header>
         <p className="ms-auto size-[26px]">
           <img  className="size-full" src={githubIcon}  alt="#"/>

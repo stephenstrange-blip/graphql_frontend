@@ -66,9 +66,9 @@ export function GameSection({ maxPlayers, to, from, numRounds, isHost, applyChan
       isHost ?
         <>
           <SettingSection to={to} from={from} numRounds={numRounds} onSubmit={applyChanges} maxPlayers={maxPlayers} />
-          <div className="flex flex-row gap-3 *:border-gray-40 *:*:border-2">
-            <button disabled={pageIsUpdating} className="hover:bg-gray-300 p-2.5 border-2 rounded-[5px] min-w-17 disabled:pointer-events-none disabled:border-gray-400" onClick={startGame}>{pageIsUpdating ? "Loading..." : "Start"}</button>
-            <Link to={"/"}><button disabled={pageIsUpdating} className="hover:bg-gray-300  border-2 p-2.5 rounded-[5px] min-w-17 disabled:pointer-events-none disabled:border-gray-400" onClick={leaveGame}>Leave</button></Link>
+          <div className="xs:pt-3 flex flex-row gap-3 xs:justify-center-safe *:border-gray-40 *:*:border-2">
+            <button disabled={pageIsUpdating} className="hover:bg-gray-300 hover:text-dark hover:border-transparent p-2.5 border-2 rounded-[5px] min-w-17 disabled:pointer-events-none disabled:border-gray-400" onClick={startGame}>{pageIsUpdating ? "Loading..." : "Start"}</button>
+            <Link to={"/"}><button disabled={pageIsUpdating} className="hover:bg-gray-300 hover:text-dark hover:border-transparent  border-2 p-2.5 rounded-[5px] min-w-17 disabled:pointer-events-none disabled:border-gray-400" onClick={leaveGame}>Leave</button></Link>
           </div>
         </>
         : <><p>Waiting</p></>
@@ -80,15 +80,15 @@ export function GameSection({ maxPlayers, to, from, numRounds, isHost, applyChan
       </>
     ),
     finished: (
-      <>
-        <p>Finished</p>
-        {isHost && <button className="" onClick={() => { setStatus("waiting"); startAnother() }}>Start Another</button>}
-      </>
+      <div className="flex flex-col gap-3.5 justify-center-safe items-center-safe ">
+        <p className="">Finished</p>
+        {isHost && <button className="hover:bg-gray-300 hover:text-dark hover:border-transparent border-2 p-2.5 rounded-[5px] min-w-17 disabled:pointer-events-none disabled:border-gray-400" onClick={() => { setStatus("waiting"); startAnother() }}>Start Another</button>}
+      </div>
     )
   }
 
   return (
-    <div className="col-span-4 row-span-2 relative flex flex-col justify-center-safe items-center-safe [&>>*]:border-1 gap-20">
+    <div className="bg-primary text-light xs:p-5 xl:col-span-4 xl:row-span-2 md:col-span-full md:row-span-3 relative md:flex md:flex-col md:justify-center-safe md:items-center-safe [&>>*]:border-1 xl:gap-20">
       {display[status]}
     </div>
   )

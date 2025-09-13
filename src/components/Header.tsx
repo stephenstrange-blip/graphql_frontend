@@ -5,7 +5,7 @@ import type { ReactElement } from "react"
 
 function Header({ children }: { children?: ReactElement | ReactElement[] }) {
   return (
-    <div className='flex flex-row items-center bg-[#dddddd] min-w-full pl-[2rem] pr-[2rem] p-[1.2rem]'>
+    <div className='rounded-b-2xl shadow-[0_5px_5px_rgba(0,0,0,.5)] flex flex-row items-center bg-light min-w-full pl-[2rem] pr-[2rem] p-[.8rem]'>
       <p className='size-[56px] '>
         <img className="size-full" src={foldedHandsIcon} alt="#" />
       </p>

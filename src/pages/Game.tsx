@@ -114,7 +114,7 @@ export default function GamePage(args: Route.ComponentProps) {
   return (
     <>
       <p className={`bg-red-800 text-white w-full text-center p-1.5 ${error ?? 'hidden'}`}>{error}</p>
-      <main className="size-full grid grid-rows-2 grid-cols-5 [&>*]:border-1 p-[1rem] gap-4">
+      <main className="overflow *:shadow-[0_5px_5px_rgba(0,0,0,.5)] *:rounded-2xl **:delay-100 ease-in-out xs:w-full md:size-full  md:grid xl:grid-rows-2 xl:grid-cols-5 md:grid-rows-4 md:grid-cols-2 p-[1rem] gap-4 xs:flex xs:flex-col-reverse">
         <PlayerSection player={player} />
         <OpponentSection opponents={opponents} numRounds={data.numRounds!} toCode={to?.code ?? ""} fromCode={from?.code ?? ""} />
         <SubmitContext value={{ isUpdating: updateGameResult.fetching, langTranslateTo: to?.code }}>

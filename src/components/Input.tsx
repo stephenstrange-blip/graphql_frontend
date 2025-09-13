@@ -1,4 +1,4 @@
-import { useContext, useRef, useState} from "react"
+import { useContext, useRef, useState } from "react"
 import { Form } from "react-router"
 import { GAME_SETTINGS, type HorizontalNumberInputArgs, type PlayerInputArgs } from "../types/types"
 import { sleep } from "../utils/utils"
@@ -60,11 +60,11 @@ export function PlayerInput({ isRoundActive, roundId, isCorrect, setIsCorrect }:
 
   return (
     <div>
-      <Form className="text-center relative" onSubmit={handleSubmit} >
+      <Form className="text-center relative flex flex-col justify-center-safe items-center-safe" onSubmit={handleSubmit} >
         <label htmlFor="answer"></label>
         <p className="absolute top-0 right-0 bg-amber-700 text-amber-100 text-[15px]">{inputError}</p>
         <input ref={inputRef}
-          className={" disabled:border-b-1 min-w-input-constraint text-[48px] focus:border-b-gray-200 border-b-2 outline-0 " + (putHighlight ? "border-green-600 focus:border-green-600" : "")}
+          className={" disabled:border-b-1 min-w-input-constraint md:text-[48px] xs:text-[24px] focus:border-b-gray-200 border-b-2 outline-0 " + (putHighlight ? "border-green-600 focus:border-green-600" : "")}
           disabled={disable}
           type="text"
           id="answer"
@@ -75,7 +75,7 @@ export function PlayerInput({ isRoundActive, roundId, isCorrect, setIsCorrect }:
             setAnswer(e.currentTarget.value)
           }}
         />
-        <button type="submit">Submit</button>
+        <button type="submit" className="mt-3"><div className="p-1">Submit</div></button>
       </Form>
     </div>
   )
@@ -84,18 +84,18 @@ export function PlayerInput({ isRoundActive, roundId, isCorrect, setIsCorrect }:
 export function HorizontalNumberInput({ children, id, increment, decrement, value }: HorizontalNumberInputArgs) {
   const maxValue = id === "numRounds" ? GAME_SETTINGS.MAX_ROUNDS : GAME_SETTINGS.MAX_PLAYERS
   return (
-    <div className="flex flex-col gap-5">
+    <>
       {/* for labels - if any */}
       {children}
       <div className="flex-row flex justify-center-safe">
-        <div onClick={decrement} className={`${value <= 1 ? "pointer-events-none": ""}`}> 
-          <p  className="p-2.5 pr-5 pl-5 cursor-pointer hover:bg-gray-300 rounded-3xl">-</p>
+        <div onClick={decrement} className={`${value <= 1 ? "pointer-events-none" : ""}`}>
+          <p className="xs:p-1.5 md:p-2.5 md:pr-5 md:pl-5 cursor-pointer hover:bg-gray-300 rounded-3xl hover:text-dark">-</p>
         </div>
-        <input className="text-center focus:border-0 max-w-fit w-20 pl-0.5 pointer-events-none" type="text" inputMode="numeric" pattern="[0-9]*" id={id} name={id} value={value} key={value} readOnly={true} />
-        <div onClick={increment} className={`${value >= maxValue ? "pointer-events-none": ""}`}>
-          <p className="p-2.5 pr-5 pl-5 cursor-pointer hover:bg-gray-300 rounded-3xl">+</p>
+        <input className="text-center focus:border-0 md:max-w-fit xs:w-10 md:w-20 pl-0.5 pointer-events-none" type="text" inputMode="numeric" pattern="[0-9]*" id={id} name={id} value={value} key={value} readOnly={true} />
+        <div onClick={increment} className={`${value >= maxValue ? "pointer-events-none" : ""}`}>
+          <p className="xs:p-1.5 md:p-2.5 md:pr-5 md:pl-5 cursor-pointer hover:bg-gray-300 rounded-3xl hover:text-dark">+</p>
         </div>
       </div>
-    </div>
+    </>
   )
 }
