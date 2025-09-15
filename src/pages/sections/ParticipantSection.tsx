@@ -38,7 +38,7 @@ export function OpponentSection({ opponents, numRounds, toCode, fromCode }: { op
           <p className="md: wi">ATS</p>
         </div>
         {opponents.map((opponent, index) => (
-          <div key={index} className="flex xl:flex-col xs:flex-row xs:justify-between text-center ">
+          <div key={index} className="flex flex-row xs:justify-between text-center ">
             <p>{opponent.player?.name}</p>
             <p>{opponent.score}</p>
             <p>{opponent.score} wpm</p>

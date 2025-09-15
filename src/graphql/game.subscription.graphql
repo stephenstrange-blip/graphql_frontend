@@ -2,16 +2,8 @@ subscription roundsPrepared {
   roundsPrepared
 }
 
-subscription playerJoined {
-  playerJoined {
-    id
-    name
-    score
-  }
-}
-
-subscription gameUpdated($id: Int = 0) {
-  gameUpdated(id: $id) {
+subscription gameUpdated($gameId: Int = 0) {
+  gameUpdated(gameId: $gameId) {
     id
     langTranslateFrom {
       code
@@ -44,5 +36,16 @@ subscription gameStatus($gameId: Int = 0, $userId: Int = 0) {
       __typename
       data
     }
+  }
+}
+
+subscription participant($gameId: Int = 10, $userId: Int = 10) {
+  playerJoined(gameId: $gameId, userId: $userId) {
+    score
+    playerId
+    player {
+      name
+    }
+    isJoining
   }
 }
