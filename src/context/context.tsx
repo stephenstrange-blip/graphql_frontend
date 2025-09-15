@@ -2,7 +2,7 @@ import { createContext } from "react"
 import { create } from "zustand"
 import { persist, createJSONStorage } from "zustand/middleware"
 import type { Action, langTranslate, State } from "../types/types";
-
+import type { RefObject } from "react";
 
 
 // Supposedly "curried" version or call signatures
@@ -22,4 +22,4 @@ export const useGameStore = create<State & Action>()(
   ),
 )
 
-export const SubmitContext = createContext({ isUpdating: false, langTranslateTo: null as langTranslate["code"] });
+export const SubmitContext = createContext<{ isUpdating: boolean, langTranslateTo: langTranslate["code"], pointRef: RefObject<HTMLSpanElement | null> | null }>({ isUpdating: false, langTranslateTo: null, pointRef: null });

@@ -1,8 +1,8 @@
 import type { Route } from "./+types/Game"
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { SubmitContext, useGameStore } from "../context/context"
 import { useMutation, useQuery, useSubscription } from "urql"
-import { GameDocument, GameStatusDocument, GameUpdatedDocument, ParticipantDocument, UpdateGameDocument } from "../graphql/generated"
+import { GameDocument, GameStatusDocument, GameUpdatedDocument, ParticipantDocument, PointUpdatedDocument, UpdateGameDocument, type PointUpdatedSubscription } from "../graphql/generated"
 import type { GameDisplay, GamePageData, Participants, updateGameSettings } from "../types/types"
 import { filterParticipants, formatParticipantPayload, parseFormData } from "../utils/utils"
 import { GameSection } from "./sections/GameSection"
@@ -10,17 +10,25 @@ import { PlayerSection, OpponentSection } from "./sections/ParticipantSection"
 
 export default function GamePage(args: Route.ComponentProps) {
   const userId = sessionStorage.getItem("userId")
+
   const gameId = useGameStore(state => state.gameId);
+  const gameStatus = useGameStore(state => state.status)
   const setStatus = useGameStore(state => state.setStatus)
   const resetStatus = useGameStore(state => state.reset)
+
+  // Need to put pointRef above handleUpdatedPoint
+  const pointRef = useRef<HTMLSpanElement>(null)
+  const [updatedPoint] = useSubscription({ query: PointUpdatedDocument, variables: { gameId } }, handleUpdatedPoint)
   const [newGameSettings] = useSubscription({ query: GameUpdatedDocument, variables: { gameId } })
   const [newParticipants] = useSubscription({ query: ParticipantDocument, variables: { gameId, userId: Number(userId) } })
+
   const [gameQueryResult] = useQuery({ query: GameDocument, variables: { gameId } })
   const [updateGameResult, updateGame] = useMutation(UpdateGameDocument)
+
   const [error, setError] = useState(gameQueryResult.error?.message ? gameQueryResult.error.message : null)
   const [participants, setParticipants] = useState<Participants>([])
-  let data: GamePageData = {}
 
+  let data: GamePageData = {}
   //  Get data from query(initial) or subscription(latest)
   if (newGameSettings.data?.gameUpdated) {
     data = newGameSettings.data.gameUpdated
@@ -29,7 +37,7 @@ export default function GamePage(args: Route.ComponentProps) {
   }
 
   useEffect(() => {
-    
+    // update participants based on subscription updates
     if (newParticipants.data?.playerJoined) {
       const update = formatParticipantPayload(newParticipants.data?.playerJoined) || []
       const leavingParticipantsID = update.filter(item => !item.isJoining).map(item => item.playerId)
@@ -45,7 +53,7 @@ export default function GamePage(args: Route.ComponentProps) {
   }, [newParticipants.data])
 
   useEffect(() => {
-
+    // update participants based on initial query
     if (data.participants)
       setParticipants(data.participants)
 
@@ -59,10 +67,16 @@ export default function GamePage(args: Route.ComponentProps) {
   const { player, opponents } = filterParticipants(participants ?? [])
 
   const isHost = data.hostId === Number(userId)
-  const [gameStatus] = useSubscription({ query: GameStatusDocument, variables: { gameId, userId: Number(userId) } })
+  const [newGameStatus] = useSubscription({ query: GameStatusDocument, variables: { gameId, userId: Number(userId) } })
+
+  // Restart points subscription - consumed by Progress and 
+  // Participant section - on every game status change
+  useEffect(() => {
+    updatedPoint.data = undefined
+  }, [gameStatus])
 
   useEffect(() => {
-    const payload = gameStatus.data
+    const payload = newGameStatus.data
 
     // update non-host participants to game status changes
     // hosts will reset status at GameSection
@@ -77,7 +91,7 @@ export default function GamePage(args: Route.ComponentProps) {
         setStatus(status as keyof GameDisplay)
     }
 
-  }, [isHost, gameStatus.data])
+  }, [isHost, newGameStatus.data])
 
 
   // This handler is for when user changes game settings prior to game
@@ -136,13 +150,24 @@ export default function GamePage(args: Route.ComponentProps) {
     })
   }
 
+
+  function handleUpdatedPoint(_: PointUpdatedSubscription | undefined, newPoint: PointUpdatedSubscription) {
+    // re-trigger animation on every new score update
+    if (newPoint.point && pointRef.current) {
+      pointRef.current.classList.remove("fleeting-point")
+      void pointRef.current.offsetWidth // forces reflow
+      pointRef.current.classList.add("fleeting-point")
+    }
+    return newPoint
+  }
+
   return (
     <>
       <p className={`bg-red-800 text-white w-full text-center p-1.5 ${error ?? 'hidden'}`}>{error}</p>
       <main className="overflow *:shadow-[0_5px_5px_rgba(0,0,0,.5)] *:rounded-2xl **:delay-100 ease-in-out xs:w-full md:size-full  md:grid xl:grid-rows-2 xl:grid-cols-5 md:grid-rows-4 md:grid-cols-2 p-[1rem] gap-4 xs:flex xs:flex-col-reverse">
-        <PlayerSection player={player} />
-        <OpponentSection opponents={opponents} numRounds={data.numRounds!} toCode={to?.code ?? ""} fromCode={from?.code ?? ""} />
-        <SubmitContext value={{ isUpdating: updateGameResult.fetching, langTranslateTo: to?.code }}>
+        <PlayerSection player={player} updatedPoint={updatedPoint}/>
+        <OpponentSection opponents={opponents} numRounds={data.numRounds!} toCode={to?.code ?? ""} fromCode={from?.code ?? ""} updatedPoint={updatedPoint} />
+        <SubmitContext value={{ isUpdating: updateGameResult.fetching, langTranslateTo: to?.code, pointRef }}>
           <GameSection
             to={to ?? {}}
             from={from ?? {}}
@@ -153,6 +178,7 @@ export default function GamePage(args: Route.ComponentProps) {
             startAnother={startAnother}
             maxPlayers={data.maxPlayers!}
             setStatus={setStatus}
+            updatedPoint={updatedPoint}
           />
         </SubmitContext>
       </main>

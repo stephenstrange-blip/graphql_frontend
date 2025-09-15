@@ -9,7 +9,7 @@ import { useMutation } from "urql";
 import { ExitGameDocument, StartRoundDocument } from "../../graphql/generated";
 import { Link } from "react-router";
 
-export function GameSection({ maxPlayers, to, from, numRounds, isHost, applyChanges, setError, startAnother }: GameSectionArgs) {
+export function GameSection({ maxPlayers, to, from, numRounds, isHost, applyChanges, setError, startAnother, updatedPoint }: GameSectionArgs) {
   const setStatus = useGameStore(state => state.setStatus);
   const resetState = useGameStore(state => state.reset);
   const gameId = useGameStore(state => state.gameId)
@@ -46,7 +46,6 @@ export function GameSection({ maxPlayers, to, from, numRounds, isHost, applyChan
   }
 
   const leaveGame = () => {
-  
     // if host, removes all participants in the game
     // else, removes just the participant who left
     exitGame({ gameId, hostId: Number(userId), isHost }).then(result => {
@@ -69,18 +68,18 @@ export function GameSection({ maxPlayers, to, from, numRounds, isHost, applyChan
           <SettingSection to={to} from={from} numRounds={numRounds} onSubmit={applyChanges} maxPlayers={maxPlayers} />
           <div className="xs:pt-3 flex flex-row gap-3 xs:justify-center-safe *:border-gray-40 *:*:border-2">
             <button disabled={pageIsUpdating} className="hover:bg-gray-300 hover:text-dark hover:border-transparent p-2.5 border-2 rounded-[5px] min-w-17 disabled:pointer-events-none disabled:border-gray-400" onClick={startGame}>{pageIsUpdating ? "Loading..." : "Start"}</button>
-            <Link to={"/"}><button disabled={pageIsUpdating} className="hover:bg-gray-300 hover:text-dark hover:border-transparent  border-2 p-2.5 rounded-[5px] min-w-17 disabled:pointer-events-none disabled:border-gray-400" onClick={leaveGame}>Leave</button></Link>
+            <Link to={"/"}><button disabled={pageIsUpdating} className="hover:bg-gray-300 hover:text-dark hover:border-transparent border-2 p-2.5 rounded-[5px] min-w-17 disabled:pointer-events-none disabled:border-gray-400" onClick={leaveGame}>Leave</button></Link>
           </div>
         </>
-        : <div className="flex flex-col gap-3.5">
+        : <div className="flex flex-col gap-3.5 justify-center-safe items-center-safe">
           <p className="text-center">Waiting</p>
-          <Link to={"/"}><button disabled={pageIsUpdating} className="hover:bg-gray-300 hover:text-dark hover:border-transparent  border-2 p-2.5 rounded-[5px] min-w-17 disabled:pointer-events-none disabled:border-gray-400" onClick={leaveGame}>Leave</button></Link>
+          <Link to={"/"}><button disabled={pageIsUpdating} className="hover:bg-gray-300 hover:text-dark hover:border-transparent border-2 p-2.5 rounded-[5px] min-w-17 disabled:pointer-events-none disabled:border-gray-400" onClick={leaveGame}>Leave</button></Link>
         </div>
     ),
     started: (
       <>
         <RoundSection gameId={gameId} />
-        <ProgressSection numRounds={numRounds} />
+        <ProgressSection numRounds={numRounds} updatedPoint={updatedPoint} />
       </>
     ),
     finished: (

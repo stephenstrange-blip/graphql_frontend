@@ -1,20 +1,18 @@
-import { useQuery, useSubscription } from "urql"
+import { useQuery, type UseSubscriptionState } from "urql"
 import githubIcon from "../../assets/github-original.svg"
-import { useGameStore } from "../../context/context"
-import { PointsDocument, PointUpdatedDocument, type PointUpdatedSubscription } from "../../graphql/generated";
-import { useEffect, useRef, useState } from "react";
+import { SubmitContext, useGameStore } from "../../context/context"
+import { PointsDocument, type PointUpdatedSubscription } from "../../graphql/generated";
+import { useContext, useEffect, useState } from "react";
 import { getAllPoints } from "../../utils/utils";
 import { GAME_SETTINGS, type ScoreBoard } from "../../types/types";
 
-export function ProgressSection({ numRounds }: { numRounds: number }) {
+
+export function ProgressSection({ numRounds, updatedPoint }: { numRounds: number, updatedPoint: UseSubscriptionState<PointUpdatedSubscription> }) {
   const gameId = useGameStore(state => state.gameId);
   const userId = sessionStorage.getItem("userId");
-  const pointRef = useRef<HTMLSpanElement>(null)
+  const { pointRef, } = useContext(SubmitContext)
   const [pointsResult] = useQuery({ query: PointsDocument, variables: { gameId } })
-  // INVESTIGATE THE SUBSCRIPTION HANDLERS WHY IT IS RECEIVING DATA TWICE
-  const [updatedPoint] = useSubscription({ query: PointUpdatedDocument, variables: { gameId } }, handleUpdatedPoint)
   const [scoreBoard, setScoreBoard] = useState<ScoreBoard[]>([]);
-
 
   let error: Array<string> = [];
 
@@ -29,6 +27,7 @@ export function ProgressSection({ numRounds }: { numRounds: number }) {
   // update scoreBoard on subscription payloads
   useEffect(() => {
     const newPoint = updatedPoint.data?.point ?? { points: null, userId: null };
+
     if (newPoint.points && Number.isInteger(newPoint.userId)) {
 
       setScoreBoard(prev => {
@@ -43,17 +42,6 @@ export function ProgressSection({ numRounds }: { numRounds: number }) {
     }
   }, [updatedPoint.data])
 
-
-  function handleUpdatedPoint(_: PointUpdatedSubscription | undefined, newPoint: PointUpdatedSubscription) {
-    // re-trigger animation on every new score update
-    if (newPoint.point && pointRef.current) {
-      pointRef.current.classList.remove("fleeting-point")
-      void pointRef.current.offsetWidth // forces reflow
-      pointRef.current.classList.add("fleeting-point")
-    }
-    return newPoint
-  }
-
   if (pointsResult.data?.points?.__typename === "CustomError") {
     error.push(`Error (${pointsResult.data.points.status}): ${pointsResult.data.points.message}`)
   } else if (pointsResult.error) {
@@ -66,7 +54,7 @@ export function ProgressSection({ numRounds }: { numRounds: number }) {
     <>
       <span className={`${error.length === 0 && 'hidden'}`}>{error.map(err => <p>{err}</p>)}</span>
       {updatedPoint.data?.point?.userId === Number(userId) && <span ref={pointRef} className="fleeting-point absolute xs:top-10 xs:right-30 lg:top-10 lg:right-70 text-[30px]">+{updatedPoint.data?.point.points}</span>}
-      <div className=" scroll-smooth overflow-x-scroll flex flex-col justify-center-safe items-center-safe absolute top-0 right-0 xs:max-sm:min-w-[135px] md:min-w-[270px] xs:max-h-[50px] lg:max-h-[140px] md:p-4.5 xs:pt-1 xs:pr-1.5">
+      <div className=" scroll-smooth overflow-x-scroll flex flex-col justify-center-safe items-center-safe absolute top-0 right-0 xs:max-sm:min-w-[135px] md:min-w-[270px] xs:max-md:max-h-[50px] lg:max-h-[140px] md:p-4.5 xs:pt-1 xs:pr-1.5">
         {
           scoreBoard.map(item => (
             <ProgressDisplay key={item.userId} points={item.points} numRounds={numRounds} />
