@@ -46,9 +46,10 @@ export function GameSection({ maxPlayers, to, from, numRounds, isHost, applyChan
   }
 
   const leaveGame = () => {
-
-    // remove all participants from the game preparation display
-    exitGame({ gameId, hostId: Number(userId) }).then(result => {
+  
+    // if host, removes all participants in the game
+    // else, removes just the participant who left
+    exitGame({ gameId, hostId: Number(userId), isHost }).then(result => {
       if (result.error)
         return setError("Error: " + result.error)
       if (result.data?.exitGame?.__typename === "CustomError")
@@ -71,7 +72,10 @@ export function GameSection({ maxPlayers, to, from, numRounds, isHost, applyChan
             <Link to={"/"}><button disabled={pageIsUpdating} className="hover:bg-gray-300 hover:text-dark hover:border-transparent  border-2 p-2.5 rounded-[5px] min-w-17 disabled:pointer-events-none disabled:border-gray-400" onClick={leaveGame}>Leave</button></Link>
           </div>
         </>
-        : <><p>Waiting</p></>
+        : <div className="flex flex-col gap-3.5">
+          <p className="text-center">Waiting</p>
+          <Link to={"/"}><button disabled={pageIsUpdating} className="hover:bg-gray-300 hover:text-dark hover:border-transparent  border-2 p-2.5 rounded-[5px] min-w-17 disabled:pointer-events-none disabled:border-gray-400" onClick={leaveGame}>Leave</button></Link>
+        </div>
     ),
     started: (
       <>
